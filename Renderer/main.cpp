@@ -4,9 +4,9 @@
 #include <math.h>
 #include <vector>
 #include <stack>
+
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
@@ -14,14 +14,17 @@
 
 #include "Sphere.h"
 #include "Tube.h"
+#include "Cube.h"
 #include "Camera.h"
 #include "Shader.h"
 
 std::stack<glm::mat4> matStack;
 std::vector<Model*> models;
 Sphere MySphere(20, 10, 100);
+Cube MyCube;
 Camera MyCamera;
 Shader MyShader;
+Shader MyInstancingShader;
 
 float const PI = 3.141592f;
 float timeElapsed;
@@ -97,6 +100,7 @@ void Initialize(void)
 	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 	
 	MySphere.CreateVAO();
+	MyCube.CreateVAO();
 
 	models.push_back(new Sphere(20, 10, 100));
 	models.push_back(new Tube(20, 10, 25));
@@ -105,6 +109,7 @@ void Initialize(void)
 	}
 
 	MyShader.Create("Shader.vert", "Shader.frag");
+	MyInstancingShader.Create("InstancingShader.vert", "InstancingShader.frag");
 }
 
 void RenderFunction(void)
@@ -113,9 +118,11 @@ void RenderFunction(void)
 	glEnable(GL_DEPTH_TEST);
 	
 	timeElapsed = glutGet(GLUT_ELAPSED_TIME);
+
+	MyShader.Bind();
 	MyCamera.Update();
-	MyShader.setUniformMat4("viewShader", MyCamera.getView());
-	MyShader.setUniformMat4("projectionShader", MyCamera.getProjection());
+	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
+	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
 
 	glm::mat4 identity = glm::mat4(1.0f);
 	matStack.push(identity);
@@ -125,7 +132,7 @@ void RenderFunction(void)
 	matStack.top() *= rotateSun;
 	matStack.push(matStack.top());
 	
-	MyShader.setUniformMat4("modelShader", rotateSun);
+	MyShader.setUniformMat4("modelMatrix", rotateSun);
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 2);
 	MySphere.Draw();
@@ -142,7 +149,7 @@ void RenderFunction(void)
 	matStack.top() *= rotatePlanetAxis;
 	matStack.top() *= scalePlanet;
 	
-	MyShader.setUniformMat4("modelShader", matStack.top());
+	MyShader.setUniformMat4("modelMatrix", matStack.top());
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 3);
 	MySphere.Draw();
@@ -157,16 +164,25 @@ void RenderFunction(void)
 	matStack.top() *= rotateSatelliteAxis;
 	matStack.top() *= scaleSatellite;
 
-	MyShader.setUniformMat4("modelShader", matStack.top());
+	MyShader.setUniformMat4("modelMatrix", matStack.top());
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 4);
 	MySphere.Draw();
 
-	/*MyShader.setUniformMat4("modelShader", matStack.top());
+	/*MyShader.setUniformMat4("modelMatrix", matStack.top());
 	for (Model* model : models) {
 		model->Draw();
 	}*/
-	
+
+	MyInstancingShader.Bind();
+	MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
+	MyInstancingShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
+	MyInstancingShader.setUniformInt("codCol", 0);
+	MyCube.Draw();
+	//MyInstancingShader.setUniformInt("codCol", 1);
+	//MyCube.DrawEdges();
+
+
 	glutSwapBuffers();
 	glFlush();
 }

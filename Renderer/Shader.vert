@@ -7,13 +7,13 @@ out vec4 gl_Position;
 out vec3 ex_Color;
 flat out int vtx_Index;
 
-uniform mat4 modelShader;
-uniform mat4 viewShader;
-uniform mat4 projectionShader;
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
 
 void main(void)
 {
-    gl_Position = projectionShader*viewShader*modelShader*in_Position;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * in_Position;
     ex_Color=in_Color;
     vtx_Index = gl_VertexID;
 } 

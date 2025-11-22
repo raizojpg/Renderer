@@ -7,7 +7,6 @@ public:
 	void Draw() override;
 	~Tube();
 private:
-	float const PI = 3.141592f;
 	float const U_MIN = -200, U_MAX = 0, V_MIN = 0, V_MAX = 2 * PI;
 	int const NR_PARR, NR_MERID, NR_VF;
 	float const step_u, step_v, radius;

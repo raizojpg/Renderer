@@ -7,9 +7,9 @@ Camera::Camera() {
 
 	Refx = 0.0f, Refy = 0.0f, Refz = 0.0f;
 	Obsx = 0.0f, Obsy = 0.0f, Obsz = -300.0f;
-	Vx = 0.0f, Vy = 0.0f, Vz = -1.0f;
+	Vx = 0.0f, Vy = 0.0f, Vz = 1.0f;
 
-	alpha = 0.0f, beta = 0.0f, dist = 300.0f;
+	alpha = 0.0f, beta = 0.0f, dist = 1500.0f;
 
 }
 

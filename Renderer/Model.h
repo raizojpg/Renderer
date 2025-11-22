@@ -16,6 +16,7 @@ public:
 	virtual ~Model();
 
 protected:
+	float const PI = 3.141592f;
 	GLuint VaoId, VboId, EboId;
 };
 

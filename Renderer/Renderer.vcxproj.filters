@@ -117,6 +117,9 @@
     <ClCompile Include="Tube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1025,6 +1028,9 @@
     <ClInclude Include="Tube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1504,6 +1510,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="Shader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="InstancingShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="InstancingShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
