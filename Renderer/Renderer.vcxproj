@@ -135,6 +135,7 @@ xcopy /y /d "$(ProjectDir)lib\x32\SOIL\*.dll" "$(OutDir)" &amp;</Command>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,6 +161,7 @@ cd "$(ProjectDir)/lib/x64/SOIL" &amp; xcopy /c /y *.dll *.lib</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -185,6 +187,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\imageloader.cpp" />
     <ClCompile Include="src\loadShaders.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Tube.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -488,8 +491,10 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="include\loadShaders.h" />
     <ClInclude Include="include\SOIL.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="PerlinNoise.hpp" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Tube.h" />
   </ItemGroup>
   <ItemGroup>

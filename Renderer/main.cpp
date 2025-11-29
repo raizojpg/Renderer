@@ -14,14 +14,19 @@
 
 #include "Sphere.h"
 #include "Tube.h"
+#include "Terrain.h"
 #include "Cube.h"
 #include "Camera.h"
 #include "Shader.h"
+
+#include "PerlinNoise.hpp"
 
 std::stack<glm::mat4> matStack;
 std::vector<Model*> models;
 Sphere MySphere(20, 10, 100);
 Cube MyCube;
+Terrain MyTerrain(256, 256,	50);
+
 Camera MyCamera;
 Shader MyShader;
 Shader MyInstancingShader;
@@ -34,12 +39,18 @@ GLint winWidth = 1000, winHeight = 600;
 
 void ProcessNormalKeys(unsigned char key, int x, int y)
 {
-	switch (key) {		
+	switch (key) {
 	case '-':
-		MyCamera.distR() += 5.0;
+		MyCamera.distR() += 15.0;
 		break;
 	case '+':
-		MyCamera.distR() -= 5.0;
+		MyCamera.distR() -= 15.0;
+		break;
+	case 'q':
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case 'e':
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
 	}
 	if (key == 27)
@@ -51,10 +62,10 @@ void ProcessSpecialKeys(int key, int xx, int yy)
 	switch (key)			
 	{
 	case GLUT_KEY_LEFT:
-		MyCamera.betaR() -= 0.01f;
+		MyCamera.betaR() -= 0.05f;
 		break;
 	case GLUT_KEY_RIGHT:
-		MyCamera.betaR() += 0.01f;
+		MyCamera.betaR() += 0.05f;
 		break;
 	case GLUT_KEY_UP:
 		MyCamera.alphaR() += incr_alpha1;
@@ -64,7 +75,7 @@ void ProcessSpecialKeys(int key, int xx, int yy)
 		}
 		else
 		{
-			incr_alpha1 = 0.01f;
+			incr_alpha1 = 0.05f;
 		}
 		break;
 	case GLUT_KEY_DOWN:
@@ -75,7 +86,7 @@ void ProcessSpecialKeys(int key, int xx, int yy)
 		}
 		else
 		{
-			incr_alpha2 = 0.01f;
+			incr_alpha2 = 0.05f;
 		}
 		break;
 	}
@@ -101,6 +112,7 @@ void Initialize(void)
 	
 	MySphere.CreateVAO();
 	MyCube.CreateVAO();
+	MyTerrain.CreateVAO();
 
 	models.push_back(new Sphere(20, 10, 100));
 	models.push_back(new Tube(20, 10, 25));
@@ -115,6 +127,9 @@ void Initialize(void)
 void RenderFunction(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	
 	timeElapsed = glutGet(GLUT_ELAPSED_TIME);
@@ -123,6 +138,10 @@ void RenderFunction(void)
 	MyCamera.Update();
 	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
 	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
+
+	MyShader.setUniformMat4("modelMatrix", MyTerrain.getTerrainMat());
+	MyShader.setUniformInt("codCol", 0);
+	MyTerrain.Draw();
 
 	glm::mat4 identity = glm::mat4(1.0f);
 	matStack.push(identity);
@@ -181,7 +200,6 @@ void RenderFunction(void)
 	MyCube.Draw();
 	//MyInstancingShader.setUniformInt("codCol", 1);
 	//MyCube.DrawEdges();
-
 
 	glutSwapBuffers();
 	glFlush();

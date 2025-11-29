@@ -1,5 +1,4 @@
 #include "Sphere.h"
-#include <vector>
 
 Sphere::Sphere(int p, int m, int r) : NR_PARR{ p }, NR_MERID{ m }, NR_VF{(p+1)*(m+1)}, 
 	step_u{ (U_MAX - U_MIN) / p }, step_v{ (V_MAX - V_MIN) / m }, radius(r) {}

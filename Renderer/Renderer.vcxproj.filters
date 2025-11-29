@@ -87,12 +87,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\imageloader.cpp">
-      <Filter>Source Files\template-built-ins\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\loadShaders.cpp">
       <Filter>Source Files\template-built-ins\Utils</Filter>
     </ClCompile>
@@ -118,6 +112,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imageloader.cpp">
+      <Filter>Source Files\template-built-ins\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1030,6 +1033,12 @@
     </ClInclude>
     <ClInclude Include="Cube.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PerlinNoise.hpp">
+      <Filter>Header Files\template-built-ins\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
