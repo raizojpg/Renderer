@@ -8,12 +8,16 @@
 #include <iostream>
 #include <vector>
 
-class Model
-{
+#include "MaterialManager.h"
+
+class Model{
 public:
 	Model();
 	void Bind();
 	void Unbind();
+	void setMaterial(Material other);
+	Material& getMaterial();
+	
 	virtual void CreateVAO() = 0;
 	virtual void Draw() = 0;
 	virtual ~Model();
@@ -21,5 +25,6 @@ public:
 protected:
 	float const PI = 3.141592f;
 	GLuint VaoId, VboId, EboId;
+	Material material;
 };
 

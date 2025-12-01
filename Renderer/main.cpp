@@ -17,9 +17,15 @@
 #include "Terrain.h"
 #include "Cube.h"
 #include "Camera.h"
-#include "Shader.h"
+#include "ShaderManager.h"
+#include "LightManager.h"
+#include "MaterialManager.h"
 
 #include "PerlinNoise.hpp"
+
+ShaderManager shaders;
+MaterialManager materials;
+LightManager lights;
 
 std::stack<glm::mat4> matStack;
 std::vector<Model*> models;
@@ -28,8 +34,7 @@ Cube MyCube;
 Terrain MyTerrain(256, 256,	50);
 
 Camera MyCamera;
-Shader MyShader;
-Shader MyInstancingShader;
+
 
 float const PI = 3.141592f;
 float timeElapsed;
@@ -110,9 +115,12 @@ void Initialize(void)
 {
 	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 	
+	shaders.Init();
+
 	MySphere.CreateVAO();
 	MyCube.CreateVAO();
 	MyTerrain.CreateVAO();
+	MyTerrain.setMaterial(materials.opaque);
 
 	models.push_back(new Sphere(20, 10, 100));
 	models.push_back(new Tube(20, 10, 25));
@@ -120,27 +128,30 @@ void Initialize(void)
 		model->CreateVAO();
 	}
 
-	MyShader.Create("Shader.vert", "Shader.frag");
-	MyInstancingShader.Create("InstancingShader.vert", "InstancingShader.frag");
 }
 
 void RenderFunction(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW); 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	
 	timeElapsed = glutGet(GLUT_ELAPSED_TIME);
 
+	Shader& MyShader = shaders.MyShader;
+
 	MyShader.Bind();
+	MyShader.updateLight(lights.myLight);
+
 	MyCamera.Update();
+	MyShader.setUniformVec3("obsShader", MyCamera.getObs());
 	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
 	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
 
 	MyShader.setUniformMat4("modelMatrix", MyTerrain.getTerrainMat());
 	MyShader.setUniformInt("codCol", 0);
+	MyShader.updateMaterial(MyTerrain.getMaterial());
 	MyTerrain.Draw();
 
 	glm::mat4 identity = glm::mat4(1.0f);
@@ -154,6 +165,8 @@ void RenderFunction(void)
 	MyShader.setUniformMat4("modelMatrix", rotateSun);
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 2);
+	MySphere.setMaterial(materials.metallic);
+	MyShader.updateMaterial(MySphere.getMaterial());
 	MySphere.Draw();
 
 	glm::mat4 scalePlanet = glm::scale(glm::mat4(1.0f), glm::vec3(0.4, 0.4, 0.4));
@@ -171,6 +184,8 @@ void RenderFunction(void)
 	MyShader.setUniformMat4("modelMatrix", matStack.top());
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 3);
+	MySphere.setMaterial(materials.matte);
+	MyShader.updateMaterial(MySphere.getMaterial());
 	MySphere.Draw();
 
 	glm::mat4 scaleSatellite = glm::scale(glm::mat4(1.0f), glm::vec3(0.1, 0.1, 0.1));
@@ -186,20 +201,22 @@ void RenderFunction(void)
 	MyShader.setUniformMat4("modelMatrix", matStack.top());
 	matStack.pop();
 	MyShader.setUniformInt("codCol", 4);
+	MySphere.setMaterial(materials.opaque);
+	MyShader.updateMaterial(MySphere.getMaterial());
 	MySphere.Draw();
 
-	/*MyShader.setUniformMat4("modelMatrix", matStack.top());
-	for (Model* model : models) {
-		model->Draw();
-	}*/
+	///*MyShader.setUniformMat4("modelMatrix", matStack.top());
+	//for (Model* model : models) {
+	//	model->Draw();
+	//}*/
 
-	MyInstancingShader.Bind();
-	MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
-	MyInstancingShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
-	MyInstancingShader.setUniformInt("codCol", 0);
+	shaders.MyInstancingShader.Bind();
+	shaders.MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
+	shaders.MyInstancingShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
+	shaders.MyInstancingShader.setUniformInt("codCol", 0);
 	MyCube.Draw();
-	//MyInstancingShader.setUniformInt("codCol", 1);
-	//MyCube.DrawEdges();
+	////shaders.MyInstancingShader.setUniformInt("codCol", 1);
+	////MyCube.DrawEdges();
 
 	glutSwapBuffers();
 	glFlush();

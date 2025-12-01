@@ -123,6 +123,15 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1040,6 +1049,15 @@
     <ClInclude Include="PerlinNoise.hpp">
       <Filter>Header Files\template-built-ins\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1525,6 +1543,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="InstancingShader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="LightShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="LightShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

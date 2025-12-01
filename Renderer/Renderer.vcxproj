@@ -180,9 +180,12 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
+    <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\imageloader.cpp" />
@@ -490,9 +493,12 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\loadShaders.h" />
     <ClInclude Include="include\SOIL.h" />
+    <ClInclude Include="LightManager.h" />
+    <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PerlinNoise.hpp" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Tube.h" />
@@ -659,6 +665,8 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="lib\x64\GL\glew32.dll" />
     <None Include="lib\x64\GL\glew32s.dll" />
     <None Include="lib\x64\SOIL\SOIL.dll" />
+    <None Include="LightShader.frag" />
+    <None Include="LightShader.vert" />
     <None Include="Shader.frag" />
     <None Include="Shader.vert" />
   </ItemGroup>
