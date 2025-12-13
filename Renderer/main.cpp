@@ -20,6 +20,7 @@
 #include "ShaderManager.h"
 #include "LightManager.h"
 #include "MaterialManager.h"
+#include "InputManager.h"
 
 #include "PerlinNoise.hpp"
 
@@ -34,67 +35,26 @@ Cube MyCube;
 Terrain MyTerrain(256, 256,	50);
 
 Camera MyCamera;
+InputManager inputs(MyCamera);
 
-
-float const PI = 3.141592f;
 float timeElapsed;
-float incr_alpha1 = 0.01f, incr_alpha2 = 0.01f;
 
 GLint winWidth = 1000, winHeight = 600;
 
-void ProcessNormalKeys(unsigned char key, int x, int y)
-{
-	switch (key) {
-	case '-':
-		MyCamera.distR() += 15.0;
-		break;
-	case '+':
-		MyCamera.distR() -= 15.0;
-		break;
-	case 'q':
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		break;
-	case 'e':
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-	}
-	if (key == 27)
-		exit(0);
+void ProcessNormalKeys(unsigned char key, int x, int y) {
+	inputs.ProcessNormalKeys(key, x, y);
 }
 
-void ProcessSpecialKeys(int key, int xx, int yy)
-{
-	switch (key)			
-	{
-	case GLUT_KEY_LEFT:
-		MyCamera.betaR() -= 0.05f;
-		break;
-	case GLUT_KEY_RIGHT:
-		MyCamera.betaR() += 0.05f;
-		break;
-	case GLUT_KEY_UP:
-		MyCamera.alphaR() += incr_alpha1;
-		if (abs(MyCamera.alphaR() - PI / 2) < 0.05)
-		{
-			incr_alpha1 = 0.f;
-		}
-		else
-		{
-			incr_alpha1 = 0.05f;
-		}
-		break;
-	case GLUT_KEY_DOWN:
-		MyCamera.alphaR() -= incr_alpha2;
-		if (abs(MyCamera.alphaR() + PI / 2) < 0.05)
-		{
-			incr_alpha2 = 0.f;
-		}
-		else
-		{
-			incr_alpha2 = 0.05f;
-		}
-		break;
-	}
+void ProcessSpecialKeys(int key, int x, int y) {
+	inputs.ProcessSpecialKeys(key, x, y);
+}
+
+void MouseButton(int button, int state, int x, int y) {
+	inputs.MouseButton(button, state, x, y);
+}
+
+void MouseMotion(int x, int y) {
+	inputs.MouseMotion(x, y);
 }
 
 void ReshapeFunction(GLint newWidth, GLint newHeight)
@@ -239,6 +199,8 @@ int main(int argc, char* argv[])
 	glutIdleFunc(RenderFunction);
 	glutKeyboardFunc(ProcessNormalKeys);
 	glutSpecialFunc(ProcessSpecialKeys);
+	glutMouseFunc(MouseButton);
+	glutMotionFunc(MouseMotion);
 	glutCloseFunc(Cleanup);
 
 	glutMainLoop();

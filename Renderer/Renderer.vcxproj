@@ -180,6 +180,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
@@ -493,6 +494,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\loadShaders.h" />
     <ClInclude Include="include\SOIL.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Model.h" />

@@ -5,22 +5,19 @@ Camera::Camera() {
 
 	width = 800, height = 600, znear = 1, fov = 30;
 
-	Refx = 0.0f, Refy = 0.0f, Refz = 0.0f;
-	Obsx = 0.0f, Obsy = 0.0f, Obsz = -300.0f;
-	Vx = 0.0f, Vy = 0.0f, Vz = 1.0f;
+	this->setRef(0, 0, 0);
+	this->setVert(0, 0, 1);
 
 	alpha = 0.0f, beta = 0.0f, dist = 1500.0f;
 
 }
 
 void Camera::Update() {
-	this->setRef(Refx, Refy, Refz);
 	this->setObs(
-		Refx + dist * cos(alpha) * cos(beta),
-		Refy + dist * cos(alpha) * sin(beta),
-		Refz + dist * sin(alpha)
+		Ref.x + dist * cos(alpha) * cos(beta),
+		Ref.y + dist * cos(alpha) * sin(beta),
+		Ref.z + dist * sin(alpha)
 	);
-	this->setVert(Vx, Vy, Vz);
 	this->setView();
 	this->setProjection();
 }
@@ -52,6 +49,28 @@ void Camera::setProjection() {
 	projection = glm::infinitePerspective(fov, GLfloat(width) / GLfloat(height), znear);
 }
 glm::mat4 Camera::getProjection() { return projection; }
+
+void Camera::MoveForward(float delta) {
+	glm::vec3 dir = glm::normalize(Ref - Obs);
+	//Obs += dir * delta;
+	Ref += dir * delta;
+}
+void Camera::MoveBackward(float delta) {
+	glm::vec3 dir = glm::normalize(Ref - Obs);
+	//Obs -= dir * delta;
+	Ref -= dir * delta;
+}
+void Camera::MoveLeft(float delta) {
+	glm::vec3 right = glm::normalize(glm::cross(Ref - Obs, Vert));
+	//Obs += right * delta;
+	Ref += right * delta;
+}
+void Camera::MoveRight(float delta) {
+	glm::vec3 right = glm::normalize(glm::cross(Ref - Obs, Vert));
+	//Obs -= right * delta;
+	Ref -= right * delta;
+}
+
 
 float& Camera::widthR() { return width; }
 float& Camera::heightR() { return height; }

@@ -28,6 +28,10 @@ public:
 	void setProjection();
 	glm::mat4 getProjection();
 
+	void MoveForward(float delta);
+	void MoveBackward(float delta);
+	void MoveLeft(float delta);
+	void MoveRight(float delta);
 
 	float& widthR();
 	float& heightR();
@@ -41,9 +45,6 @@ private:
 	float width, height, znear, fov;
 	//view
 	glm::vec3 Obs, Ref, Vert;
-	float Refx, Refy, Refz;
-	float Obsx, Obsy, Obsz;
-	float Vx, Vy, Vz;
 	//movement
 	float alpha, beta, dist; 
 };
