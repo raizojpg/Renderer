@@ -3,6 +3,7 @@
 in vec3 ex_Color;
 in vec3 frag_Position;
 in vec3 frag_Normal;
+in vec3 in_ViewPos;
 
 struct Material
 {
@@ -27,6 +28,11 @@ uniform Light lightShader;
 uniform vec3 obsShader;
 
 out vec3 out_Color;
+
+vec3 result;
+float fogStart = 10000.0;
+float fogEnd = 20000.0;
+vec3 fogColor = vec3(0.7, 0.7, 0.7);
 
 void main(void)
 {
@@ -74,5 +80,11 @@ void main(void)
 
     vec3 phongColor = emission + ambient_model + attenuation_factor*(ambient_term + diffuse_term + specular_term);
 
-    out_Color = clamp(phongColor + ex_Color, 0.0, 1.0);
+    result = clamp(phongColor + ex_Color, 0.0, 1.0);
+
+    float distance = length(in_ViewPos - frag_Position);
+    float fogFactor = clamp((fogEnd - distance) / (fogEnd - fogStart), 0.0, 1.0);
+
+    out_Color = mix(fogColor, result, fogFactor);
+
 }

@@ -5,7 +5,7 @@
 ModelManager::ModelManager() {
 	MySphere = new Sphere(20, 10, 100);
 	MyCube = new Cube();
-	MyTerrain = new Terrain(256, 256, 50);
+	MyTerrain = new Terrain(513, 513, 50);
 
 	models.push_back(new Sphere(20, 10, 100));
 	models.push_back(new Tube(20, 10, 25));

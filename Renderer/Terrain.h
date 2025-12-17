@@ -10,7 +10,8 @@ public:
 	int getWidth();
 	int getLength();
 	glm::mat4 getTerrainMat();
-
+	void updateLodMap(glm::vec3 obs);
+		
 	~Terrain();
 
 private:
@@ -20,5 +21,19 @@ private:
 	glm::mat4 terrainMat;
 	unsigned char* heightData;
 	int imgWidth, imgHeight;
+	int patchSize, maxLod;
+
+	struct BufferInfo {
+		int start;
+		int count;
+	};
+
+	struct LodInfo {
+		BufferInfo border[2][4];
+		BufferInfo center;
+	};
+
+	std::vector<LodInfo> lods;
+	std::vector<std::vector<short>> lodMap;
 };
 

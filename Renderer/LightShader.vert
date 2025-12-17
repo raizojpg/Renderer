@@ -7,10 +7,12 @@ layout(location=2) in vec3 in_Normal;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform vec3 viewPos;
 
 out vec3 ex_Color;
 out vec3 frag_Position;
 out vec3 frag_Normal;
+out vec3 in_ViewPos;
 
 void main(void)
 {
@@ -18,6 +20,7 @@ void main(void)
 
     frag_Position = vec3(in_Position);
     frag_Normal = normalize(in_Normal);
+    in_ViewPos = viewPos;
 
     ex_Color = in_Color;
 }

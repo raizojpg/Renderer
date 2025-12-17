@@ -50,7 +50,7 @@ void InputManager::ProcessSpecialKeys(int key, int x, int y) {
 		MyCamera.betaR() += sphericalRotationSpeed;
 		break;
 	case GLUT_KEY_UP:
-		MyCamera.alphaR() += incr_alpha1;
+		MyCamera.alphaR() -= incr_alpha1;
 		if (abs(MyCamera.alphaR() - PI / 2) < sphericalRotationSpeed)
 		{
 			incr_alpha1 = 0.f;
@@ -61,7 +61,7 @@ void InputManager::ProcessSpecialKeys(int key, int x, int y) {
 		}
 		break;
 	case GLUT_KEY_DOWN:
-		MyCamera.alphaR() -= incr_alpha2;
+		MyCamera.alphaR() += incr_alpha2;
 		if (abs(MyCamera.alphaR() + PI / 2) < sphericalRotationSpeed)
 		{
 			incr_alpha2 = 0.f;
