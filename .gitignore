@@ -16,7 +16,6 @@
 [Oo]bj/
 Debug/
 Release/
-x64/
 x86/
 ARM/
 ARM64/
@@ -42,13 +41,6 @@ out/
 *.lastbuildstate
 *.cache
 *.tmp
-
-# Generated Code
-*.exe
-*.dll
-*.lib
-*.exp
-*.manifest
 
 # NuGet
 packages/
