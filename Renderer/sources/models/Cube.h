@@ -1,5 +1,5 @@
 #pragma once
-#include "Model.h"
+#include "../Model.h"
 
 class Cube : public Model{
 public:

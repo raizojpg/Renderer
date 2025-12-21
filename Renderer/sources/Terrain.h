@@ -9,8 +9,13 @@ public:
 
 	int getWidth();
 	int getLength();
+	int getMaxHeight();
+	int getHeightmapTex();
 	glm::mat4 getTerrainMat();
+
+	void loadHightmap();
 	void updateLodMap(glm::vec3 obs);
+	void updateShader(Shader& MyShader) override;
 		
 	~Terrain();
 
@@ -22,6 +27,7 @@ private:
 	unsigned char* heightData;
 	int imgWidth, imgHeight;
 	int patchSize, maxLod;
+	GLuint heightmapTex;
 
 	struct BufferInfo {
 		int start;

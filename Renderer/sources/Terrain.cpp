@@ -8,11 +8,6 @@ Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l },
 	terrainMat = glm::translate(glm::mat4(1.0f), glm::vec3(-(w-1) * s / 2, -(l-1) * s / 2, 2000));
 	srand(static_cast<unsigned>(time(0)));
 
-	int width, height, channels;
-	heightData = SOIL_load_image("resources/heightmap.bmp", &width, &height, &channels, SOIL_LOAD_L);
-	imgWidth = width;
-	imgHeight = height;
-
 	patchSize = 33;
 	maxLod = 5;
 
@@ -22,6 +17,8 @@ Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l },
 void Terrain::CreateVAO(){
 	std::vector<glm::vec4> Vertices(NR_VF);
 	std::vector<glm::vec3> Colors(NR_VF);
+	std::vector<glm::vec3> Normals(NR_VF);
+	std::vector<glm::vec2> UVs(NR_VF);
 	std::vector<GLushort> Indices(3 * 2 * (patchSize - 1) * (patchSize - 1) * 2);
 
 	int v_idx, t_idx = 0;
@@ -42,6 +39,12 @@ void Terrain::CreateVAO(){
 			Vertices[v_idx] = glm::vec4(x, y, z, 1.0);
 			r = g = b = -z / maxHeight;
 			Colors[v_idx] = glm::vec3(r, g, b);
+			
+			Normals[v_idx] = glm::vec3(0.0f, 0.0f, 1.0f);
+
+			float u = static_cast<float>(i) / (WIDTH - 1);
+			float v = static_cast<float>(j) / (LENGTH - 1);
+			UVs[v_idx] = glm::vec2(u, v);
 		}
 	}
 
@@ -204,14 +207,24 @@ void Terrain::CreateVAO(){
 	}
 
 	glGenVertexArrays(1, &VaoId);
+
 	glBindVertexArray(VaoId);
 	glGenBuffers(1, &VboId);
 	glGenBuffers(1, &EboId);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VboId);
-	glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(glm::vec4) + Colors.size() * sizeof(glm::vec3), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,
+		Vertices.size() * sizeof(glm::vec4) +
+		Colors.size() * sizeof(glm::vec3) +
+		Normals.size() * sizeof(glm::vec3) +
+		UVs.size() * sizeof(glm::vec2),
+		NULL, GL_STATIC_DRAW);
+
 	glBufferSubData(GL_ARRAY_BUFFER, 0, Vertices.size() * sizeof(glm::vec4), Vertices.data());
 	glBufferSubData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(glm::vec4), Colors.size() * sizeof(glm::vec3), Colors.data());
+	glBufferSubData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(glm::vec4) + Colors.size() * sizeof(glm::vec3), Normals.size() * sizeof(glm::vec3), Normals.data());
+	glBufferSubData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(glm::vec4) + Colors.size() * sizeof(glm::vec3) + Normals.size() * sizeof(glm::vec3),
+		UVs.size() * sizeof(glm::vec2), UVs.data());
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(GLushort), Indices.data(), GL_STATIC_DRAW);
@@ -220,6 +233,10 @@ void Terrain::CreateVAO(){
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(0));
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(Vertices.size() * sizeof(glm::vec4)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(Vertices.size() * sizeof(glm::vec4) + Colors.size() * sizeof(glm::vec3)));
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(Vertices.size() * sizeof(glm::vec4) + Colors.size() * sizeof(glm::vec3) + Normals.size() * sizeof(glm::vec3)));
 
 }
 
@@ -258,13 +275,51 @@ int Terrain::getWidth() { return WIDTH; }
 
 int Terrain::getLength() { return LENGTH; }
 
+int Terrain::getMaxHeight(){ return maxHeight;}
+
+int Terrain::getHeightmapTex(){ return heightmapTex; }
+
 glm::mat4 Terrain::getTerrainMat() { return terrainMat; }
+
+void Terrain::loadHightmap(){
+	int width, height, channels;
+	heightData = SOIL_load_image("resources/heightmap.bmp", &width, &height, &channels, SOIL_LOAD_L);
+	imgWidth = width;
+	imgHeight = height;
+
+	glGenTextures(1, &heightmapTex);
+	glBindTexture(GL_TEXTURE_2D, heightmapTex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, imgWidth, imgHeight, 0, GL_RED, GL_UNSIGNED_BYTE, heightData);
+
+}
 
 void Terrain::updateLodMap(glm::vec3 observer){
 	glm::vec4 obs = glm::vec4(observer, 0) - terrainMat[3];
 	float x = obs.x;
 	float y = obs.y;
 	float z = obs.z;
+
+	int patchX = int(x) / (patchSize * step);
+	int patchY = int(y) / (patchSize * step);
+
+	if (patchX < (WIDTH - 1) / (patchSize - 1) / 2) {
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(-patchSize * step, 0, 0));
+	}
+	else if (patchX > (WIDTH - 1) / (patchSize - 1) / 2) {
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(patchSize * step, 0, 0));
+	}
+	if (patchY < (LENGTH - 1) / (patchSize - 1) / 2) {
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, -patchSize * step, 0));
+	}
+	else if (patchY > (LENGTH - 1) / (patchSize - 1) / 2) {
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, patchSize * step, 0));
+	}
+
+	//std::cout << patchX << "  " << patchY << std::endl;
 	
 	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
 		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
@@ -280,7 +335,22 @@ void Terrain::updateLodMap(glm::vec3 observer){
 
 }
 
+void Terrain::updateShader(Shader& MyShader) {
+	MyShader.setUniformMat4("modelMatrix", terrainMat);
+	MyShader.setUniformInt("codCol", 0);
+	MyShader.updateMaterial(material);
+
+	MyShader.setUniformInt("usingTexture", 1);
+	MyShader.setUniformFloat("maxHeight", maxHeight);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, heightmapTex);
+	MyShader.setUniformInt("heightmap", 0);
+	MyShader.setUniformFloat("heightmapScale", (patchSize) * (patchSize)*step / 2);
+}
+
 Terrain::~Terrain(){
+	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 

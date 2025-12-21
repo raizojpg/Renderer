@@ -6,10 +6,10 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ModelManager.h"
-#include "ShaderManager.h"
-#include "LightManager.h"
-#include "InputManager.h"
+#include "sources/ModelManager.h"
+#include "sources/ShaderManager.h"
+#include "sources/LightManager.h"
+#include "sources/InputManager.h"
 
 #include "PerlinNoise.hpp"
 
@@ -64,7 +64,7 @@ void RenderFunction(void)
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
-	Shader& MyShader = shaders.MyLightShader;
+	Shader& MyShader = shaders.MyTerrainShader;
 
 	MyShader.Bind();
 	MyShader.updateLight(lights.myLight);
@@ -76,12 +76,10 @@ void RenderFunction(void)
 	MyShader.setUniformVec3("viewPos", glm::vec4(MyCamera.getObs(),0) - models.MyTerrain->getTerrainMat()[3]);
 
 	models.MyTerrain->updateLodMap(MyCamera.getObs());
-
-	MyShader.setUniformMat4("modelMatrix", models.MyTerrain->getTerrainMat());
-	MyShader.setUniformInt("codCol", 0);
-	MyShader.updateMaterial(models.MyTerrain->getMaterial());
+	models.MyTerrain->updateShader(MyShader);
 	models.MyTerrain->Draw();
 
+	MyShader.setUniformInt("usingTexture", 0);
 	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	models.Update(MyShader);
 

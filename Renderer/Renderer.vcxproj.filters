@@ -96,46 +96,46 @@
     <ClCompile Include="include\glm\detail\glm.cpp">
       <Filter>Header Files\template-built-ins\glm\detail</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Tube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\imageloader.cpp">
       <Filter>Source Files\template-built-ins\Utils</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
+    <ClCompile Include="sources\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightManager.cpp">
+    <ClCompile Include="sources\InputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderManager.cpp">
+    <ClCompile Include="sources\LightManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputManager.cpp">
+    <ClCompile Include="sources\MaterialManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModelManager.cpp">
+    <ClCompile Include="sources\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\ModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\ShaderManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\models\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\models\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\models\Tube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1031,43 +1031,43 @@
     <ClInclude Include="include\glm\simd\vector_relational.h">
       <Filter>Header Files\template-built-ins\glm\simd</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PerlinNoise.hpp">
       <Filter>Header Files\template-built-ins\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="MaterialManager.h">
+    <ClInclude Include="sources\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightManager.h">
+    <ClInclude Include="sources\InputManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderManager.h">
+    <ClInclude Include="sources\LightManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
+    <ClInclude Include="sources\MaterialManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModelManager.h">
+    <ClInclude Include="sources\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\ModelManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\ShaderManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\models\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\models\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\models\Tube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1545,22 +1545,28 @@
     <None Include="lib\x64\GL\DLLs\glew32.dll">
       <Filter>Resource Files\template-built-ins\DLLs\64b</Filter>
     </None>
-    <None Include="Shader.frag">
+    <None Include="shaders\InstancingShader.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="Shader.vert">
+    <None Include="shaders\InstancingShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="InstancingShader.frag">
+    <None Include="shaders\LightShader.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="InstancingShader.vert">
+    <None Include="shaders\LightShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="LightShader.frag">
+    <None Include="shaders\Shader.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="LightShader.vert">
+    <None Include="shaders\Shader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

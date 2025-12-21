@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "MaterialManager.h"
+#include "ShaderManager.h"
 
 class Model{
 public:
@@ -24,6 +25,7 @@ public:
 
 	virtual void CreateVAO() = 0;
 	virtual void Draw() = 0;
+	virtual void updateShader(Shader& MyShader);
 	virtual ~Model();
 
 protected:

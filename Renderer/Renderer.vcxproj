@@ -177,27 +177,25 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
-    <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="ShaderManager.cpp" />
-    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="sources\Camera.cpp" />
+    <ClCompile Include="sources\InputManager.cpp" />
+    <ClCompile Include="sources\LightManager.cpp" />
+    <ClCompile Include="sources\MaterialManager.cpp" />
+    <ClCompile Include="sources\Model.cpp" />
+    <ClCompile Include="sources\ModelManager.cpp" />
+    <ClCompile Include="sources\models\Cube.cpp" />
+    <ClCompile Include="sources\models\Sphere.cpp" />
+    <ClCompile Include="sources\models\Tube.cpp" />
+    <ClCompile Include="sources\Shader.cpp" />
+    <ClCompile Include="sources\ShaderManager.cpp" />
+    <ClCompile Include="sources\Terrain.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\imageloader.cpp" />
     <ClCompile Include="src\loadShaders.cpp" />
-    <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="Tube.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\GLFW\glfw3.h" />
     <ClInclude Include="include\GLFW\glfw3native.h" />
@@ -495,17 +493,19 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\loadShaders.h" />
     <ClInclude Include="include\SOIL.h" />
-    <ClInclude Include="InputManager.h" />
-    <ClInclude Include="LightManager.h" />
-    <ClInclude Include="MaterialManager.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelManager.h" />
     <ClInclude Include="PerlinNoise.hpp" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="ShaderManager.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Terrain.h" />
-    <ClInclude Include="Tube.h" />
+    <ClInclude Include="sources\Camera.h" />
+    <ClInclude Include="sources\InputManager.h" />
+    <ClInclude Include="sources\LightManager.h" />
+    <ClInclude Include="sources\MaterialManager.h" />
+    <ClInclude Include="sources\Model.h" />
+    <ClInclude Include="sources\ModelManager.h" />
+    <ClInclude Include="sources\models\Cube.h" />
+    <ClInclude Include="sources\models\Sphere.h" />
+    <ClInclude Include="sources\models\Tube.h" />
+    <ClInclude Include="sources\Shader.h" />
+    <ClInclude Include="sources\ShaderManager.h" />
+    <ClInclude Include="sources\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt" />
@@ -647,8 +647,6 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="include\glm\gtx\vector_angle.inl" />
     <None Include="include\glm\gtx\vector_query.inl" />
     <None Include="include\glm\gtx\wrap.inl" />
-    <None Include="InstancingShader.frag" />
-    <None Include="InstancingShader.vert" />
     <None Include="lib\x32\GLFW\DLLs\glfw3.dll" />
     <None Include="lib\x32\GLFW\glfw3.dll" />
     <None Include="lib\x32\GLFW\glfw3dll.dll" />
@@ -669,10 +667,14 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="lib\x64\GL\glew32.dll" />
     <None Include="lib\x64\GL\glew32s.dll" />
     <None Include="lib\x64\SOIL\SOIL.dll" />
-    <None Include="LightShader.frag" />
-    <None Include="LightShader.vert" />
-    <None Include="Shader.frag" />
-    <None Include="Shader.vert" />
+    <None Include="shaders\InstancingShader.frag" />
+    <None Include="shaders\InstancingShader.vert" />
+    <None Include="shaders\LightShader.frag" />
+    <None Include="shaders\LightShader.vert" />
+    <None Include="shaders\Shader.frag" />
+    <None Include="shaders\Shader.vert" />
+    <None Include="shaders\TerrainShader.frag" />
+    <None Include="shaders\TerrainShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

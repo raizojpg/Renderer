@@ -11,10 +11,10 @@
 #include "MaterialManager.h"
 
 #include "Model.h"
-#include "Sphere.h"
-#include "Tube.h"
 #include "Terrain.h"
-#include "Cube.h"
+#include "models/Sphere.h"
+#include "models/Tube.h"
+#include "models/Cube.h"
 
 class ModelManager {
 public:

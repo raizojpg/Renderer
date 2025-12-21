@@ -1,5 +1,5 @@
 #pragma once
-#include "Model.h"
+#include "../Model.h"
 class Tube : public Model{
 public:
 	Tube(int p, int m, int r);
