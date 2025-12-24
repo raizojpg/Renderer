@@ -1563,10 +1563,16 @@
     <None Include="shaders\Shader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="shaders\TerrainShader.frag">
+    <None Include="shaders\TerrainShaderNoise.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="shaders\TerrainShader.vert">
+    <None Include="shaders\TerrainShaderNoise.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainShaderHeightmap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainShaderHeightmap.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

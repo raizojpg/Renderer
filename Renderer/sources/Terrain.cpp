@@ -340,12 +340,14 @@ void Terrain::updateShader(Shader& MyShader) {
 	MyShader.setUniformInt("codCol", 0);
 	MyShader.updateMaterial(material);
 
-	MyShader.setUniformInt("usingTexture", 1);
+	MyShader.setUniformInt("usingNoise", 1);
 	MyShader.setUniformFloat("maxHeight", maxHeight);
+	MyShader.setUniformFloat("noiseScale", 0.00015f);
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, heightmapTex);
 	MyShader.setUniformInt("heightmap", 0);
-	MyShader.setUniformFloat("heightmapScale", (patchSize) * (patchSize)*step / 2);
+	MyShader.setUniformFloat("heightmapScale", (patchSize - 1) * (patchSize - 1) * step / 2);
 }
 
 Terrain::~Terrain(){

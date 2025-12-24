@@ -64,7 +64,7 @@ void RenderFunction(void)
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
-	Shader& MyShader = shaders.MyTerrainShader;
+	Shader& MyShader = shaders.MyTerrainShaderNoise;
 
 	MyShader.Bind();
 	MyShader.updateLight(lights.myLight);
@@ -79,7 +79,7 @@ void RenderFunction(void)
 	models.MyTerrain->updateShader(MyShader);
 	models.MyTerrain->Draw();
 
-	MyShader.setUniformInt("usingTexture", 0);
+	MyShader.setUniformInt("usingNoise", 0);
 	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	models.Update(MyShader);
 

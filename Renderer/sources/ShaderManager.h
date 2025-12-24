@@ -11,5 +11,6 @@ public:
 	Shader MyShader;
 	Shader MyInstancingShader;
 	Shader MyLightShader;
-	Shader MyTerrainShader;
+	Shader MyTerrainShaderHeightmap;
+	Shader MyTerrainShaderNoise;
 };

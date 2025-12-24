@@ -673,8 +673,10 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="shaders\LightShader.vert" />
     <None Include="shaders\Shader.frag" />
     <None Include="shaders\Shader.vert" />
-    <None Include="shaders\TerrainShader.frag" />
-    <None Include="shaders\TerrainShader.vert" />
+    <None Include="shaders\TerrainShaderHeightmap.frag" />
+    <None Include="shaders\TerrainShaderHeightmap.vert" />
+    <None Include="shaders\TerrainShaderNoise.frag" />
+    <None Include="shaders\TerrainShaderNoise.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

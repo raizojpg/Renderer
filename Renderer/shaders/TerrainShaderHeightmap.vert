@@ -10,10 +10,9 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 
-uniform int usingTexture;
+uniform int usingNoise;
 uniform sampler2D heightmap;
 uniform float maxHeight;
-uniform vec3 terrainOffset;
 uniform float heightmapScale;
 
 out vec3 ex_Color;
@@ -30,7 +29,7 @@ void main(void)
     //ex_Color = vec3(heightUV.x, 1.0 - heightUV.y, 0 );
 
     vec4 position;
-    if(usingTexture == 1){
+    if(usingNoise == 1){
         float height = texture(heightmap, vec2(heightUV.x, 1.0 - heightUV.y)).r * maxHeight;
    
         vec4 displacedPosition = in_Position;
