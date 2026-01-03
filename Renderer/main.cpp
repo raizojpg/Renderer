@@ -80,6 +80,13 @@ void RenderFunction(void)
 	models.MyTerrain->Draw();
 
 	MyShader.setUniformInt("usingNoise", 0);
+
+	glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(50, 50, 100));
+	MyShader.setUniformMat4("modelMatrix", skyboxMat);
+	MyShader.setUniformInt("codCol", 2);
+	MyShader.updateMaterial(models.MySkybox->getMaterial());
+	models.MySkybox->Draw();
+
 	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	models.Update(MyShader);
 

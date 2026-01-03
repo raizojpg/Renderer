@@ -30,8 +30,8 @@ uniform vec3 obsShader;
 out vec3 out_Color;
 
 vec3 result;
-float fogStart = 10000.0;
-float fogEnd = 20000.0;
+float fogStart = 30000.0;
+float fogEnd = 50000.0;
 vec3 fogColor = vec3(0.7, 0.7, 0.7);
 
 void main(void)

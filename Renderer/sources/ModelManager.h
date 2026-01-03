@@ -12,6 +12,7 @@
 
 #include "Model.h"
 #include "Terrain.h"
+#include "models/Skybox.h"
 #include "models/Sphere.h"
 #include "models/Tube.h"
 #include "models/Cube.h"
@@ -33,4 +34,5 @@ public:
     Sphere* MySphere;
     Cube* MyCube;
     Terrain* MyTerrain;
+    Skybox* MySkybox;
 };
