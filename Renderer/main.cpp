@@ -8,7 +8,6 @@
 
 #include "sources/ModelManager.h"
 #include "sources/ShaderManager.h"
-#include "sources/LightManager.h"
 #include "sources/InputManager.h"
 
 #include "PerlinNoise.hpp"
@@ -63,20 +62,14 @@ void RenderFunction(void)
 	glFrontFace(GL_CCW); 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+		
+	MyCamera.Update();
 
 	Shader& MyShader = shaders.MyTerrainShaderNoise;
-
 	MyShader.Bind();
-	MyShader.updateLight(lights.myLight);
-
-	MyCamera.Update();
-	MyShader.setUniformVec3("obsShader", MyCamera.getObs());
-	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
-	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
-	MyShader.setUniformVec3("viewPos", glm::vec4(MyCamera.getObs(),0) - models.MyTerrain->getTerrainMat()[3]);
 
 	models.MyTerrain->updateLodMap(MyCamera.getObs());
-	models.MyTerrain->updateShader(MyShader);
+	shaders.UpdateTerrainNoise(*models.MyTerrain, MyCamera, lights.myLight);
 	models.MyTerrain->Draw();
 
 	MyShader.setUniformInt("usingNoise", 0);
@@ -90,6 +83,11 @@ void RenderFunction(void)
 	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	models.Update(MyShader);
 
+
+	shaders.MyVegetationShader.Bind();
+	shaders.UpdateVegetation(*models.MyTerrain, MyCamera, lights.myLight);
+	models.MyTerrain->DrawVegetation(&shaders.MyVegetationShader);
+
 	///*MyShader.setUniformMat4("modelMatrix", matStack.top());
 	//for (Model* model : models) {
 	//	model->Draw();
@@ -101,6 +99,7 @@ void RenderFunction(void)
 	shaders.MyInstancingShader.setUniformVec3("viewPos", MyCamera.getObs());
 	shaders.MyInstancingShader.setUniformInt("codCol", 0);
 	models.MyCube->Draw();
+
 	//shaders.MyInstancingShader.setUniformInt("codCol", 1);
 	//MyCube.DrawEdges();
 

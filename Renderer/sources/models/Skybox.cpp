@@ -65,7 +65,7 @@ void Skybox::CreateVAO() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }
 
-void Skybox::Draw() {
+void Skybox::Draw(Shader* MyShader) {
 	this->Bind();
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

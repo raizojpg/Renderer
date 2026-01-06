@@ -6,7 +6,7 @@ class Sphere : public Model
 public:
 	Sphere(int p, int m, int r);
 	void CreateVAO() override;
-	void Draw() override;
+	void Draw(Shader* MyShader = nullptr) override;
 	~Sphere();
 
 private:

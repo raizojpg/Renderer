@@ -141,6 +141,9 @@
     <ClCompile Include="sources\models\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sources\models\Tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SOIL.h">
@@ -1076,6 +1079,9 @@
     <ClInclude Include="sources\models\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sources\models\Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt">
@@ -1579,6 +1585,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="shaders\TerrainShaderHeightmap.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\VegetationShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\VegetationShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

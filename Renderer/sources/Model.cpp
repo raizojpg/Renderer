@@ -26,8 +26,6 @@ glm::mat4& Model::getTransform(){
 	return transform;
 }
 
-void Model::updateShader(Shader& MyShader){}
-
 Model::~Model() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

@@ -5,7 +5,7 @@ class Skybox : public Model {
 public:
 	Skybox();
 	void CreateVAO() override;
-	void Draw() override;
+	void Draw(Shader* MyShader = nullptr) override;
 	~Skybox();
 
 private:

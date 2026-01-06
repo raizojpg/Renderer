@@ -8,8 +8,8 @@
 #include <iostream>
 #include <vector>
 
+#include "Shader.h"
 #include "MaterialManager.h"
-#include "ShaderManager.h"
 
 class Model{
 public:
@@ -24,8 +24,7 @@ public:
 	glm::mat4& getTransform();
 
 	virtual void CreateVAO() = 0;
-	virtual void Draw() = 0;
-	virtual void updateShader(Shader& MyShader);
+	virtual void Draw(Shader* MyShader = nullptr) = 0;
 	virtual ~Model();
 
 protected:

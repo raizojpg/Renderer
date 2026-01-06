@@ -71,7 +71,7 @@ void Sphere::CreateVAO(){
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(NR_VF * sizeof(glm::vec4) + NR_VF * sizeof(glm::vec3)));
 }
 
-void Sphere::Draw(){
+void Sphere::Draw(Shader* MyShader){
 	this->Bind();
 	for (int patr = 0; patr < NR_VF; patr++)
 	{

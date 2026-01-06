@@ -4,7 +4,7 @@ class Tube : public Model{
 public:
 	Tube(int p, int m, int r);
 	void CreateVAO() override;
-	void Draw() override;
+	void Draw(Shader* MyShader = nullptr) override;
 	~Tube();
 private:
 	float const U_MIN = -200, U_MAX = 0, V_MIN = 0, V_MAX = 2 * PI;

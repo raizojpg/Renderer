@@ -12,9 +12,12 @@ Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l },
 	maxLod = 5;
 
 	lodMap = std::vector<std::vector<short>>(WIDTH / (patchSize-1), std::vector<short>(LENGTH / (patchSize-1), 0));
+
+	tree = new Tree();
 }
 
 void Terrain::CreateVAO(){
+	tree->CreateVAO();
 	std::vector<glm::vec4> Vertices(NR_VF);
 	std::vector<glm::vec3> Colors(NR_VF);
 	std::vector<glm::vec3> Normals(NR_VF);
@@ -240,7 +243,7 @@ void Terrain::CreateVAO(){
 
 }
 
-void Terrain::Draw(){
+void Terrain::Draw(Shader* MyShader){
 	this->Bind();
 	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
 		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
@@ -267,6 +270,21 @@ void Terrain::Draw(){
 			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[wlod][3].count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].border[wlod][3].start * sizeof(GLushort)), baseVertex);
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].center.count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].center.start * sizeof(GLushort)), baseVertex);
+			
+		}
+	}
+}
+
+void Terrain::DrawVegetation(Shader* MyShader){
+	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
+		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
+			float x = i * step + (patchSize / 2) * step;
+			float y = j * step + (patchSize / 2) * step;
+			float z = 0.0f;
+
+			glm::mat4 model = terrainMat * glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+			MyShader->setUniformMat4("modelMatrix", model);
+			tree->Draw();
 		}
 	}
 }
@@ -274,6 +292,10 @@ void Terrain::Draw(){
 int Terrain::getWidth() { return WIDTH; }
 
 int Terrain::getLength() { return LENGTH; }
+
+int Terrain::getStep() { return step; }
+
+int Terrain::getPatchSize() { return patchSize; }
 
 int Terrain::getMaxHeight(){ return maxHeight;}
 
@@ -335,21 +357,6 @@ void Terrain::updateLodMap(glm::vec3 observer){
 
 }
 
-void Terrain::updateShader(Shader& MyShader) {
-	MyShader.setUniformMat4("modelMatrix", terrainMat);
-	MyShader.setUniformInt("codCol", 0);
-	MyShader.updateMaterial(material);
-
-	MyShader.setUniformInt("usingNoise", 1);
-	MyShader.setUniformFloat("maxHeight", maxHeight);
-	MyShader.setUniformFloat("noiseScale", 0.00015f);
-	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, heightmapTex);
-	MyShader.setUniformInt("heightmap", 0);
-	MyShader.setUniformFloat("heightmapScale", (patchSize - 1) * (patchSize - 1) * step / 2);
-}
-
 Terrain::~Terrain(){
 	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(2);
@@ -360,4 +367,6 @@ Terrain::~Terrain(){
 		SOIL_free_image_data(heightData);
 		heightData = nullptr;
 	}
+
+	delete tree;
 }

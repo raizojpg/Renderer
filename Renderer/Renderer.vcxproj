@@ -188,6 +188,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="sources\models\Cube.cpp" />
     <ClCompile Include="sources\models\Skybox.cpp" />
     <ClCompile Include="sources\models\Sphere.cpp" />
+    <ClCompile Include="sources\models\Tree.cpp" />
     <ClCompile Include="sources\models\Tube.cpp" />
     <ClCompile Include="sources\Shader.cpp" />
     <ClCompile Include="sources\ShaderManager.cpp" />
@@ -504,6 +505,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="sources\models\Cube.h" />
     <ClInclude Include="sources\models\Skybox.h" />
     <ClInclude Include="sources\models\Sphere.h" />
+    <ClInclude Include="sources\models\Tree.h" />
     <ClInclude Include="sources\models\Tube.h" />
     <ClInclude Include="sources\Shader.h" />
     <ClInclude Include="sources\ShaderManager.h" />
@@ -679,6 +681,8 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="shaders\TerrainShaderHeightmap.vert" />
     <None Include="shaders\TerrainShaderNoise.frag" />
     <None Include="shaders\TerrainShaderNoise.vert" />
+    <None Include="shaders\VegetationShader.frag" />
+    <None Include="shaders\VegetationShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

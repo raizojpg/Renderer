@@ -1,21 +1,24 @@
 #pragma once
 #include "Model.h"
+#include "models/Tree.h"
 
 class Terrain : public Model{
 public:
 	Terrain(int w, int l, int s = 500);
 	void CreateVAO() override;
-	void Draw() override;
+	void Draw(Shader* MyShader = nullptr) override;
+	void DrawVegetation(Shader* MyShader = nullptr);
 
 	int getWidth();
 	int getLength();
+	int getStep();
+	int getPatchSize();
 	int getMaxHeight();
 	int getHeightmapTex();
 	glm::mat4 getTerrainMat();
 
 	void loadHightmap();
 	void updateLodMap(glm::vec3 obs);
-	void updateShader(Shader& MyShader) override;
 		
 	~Terrain();
 
@@ -41,5 +44,7 @@ private:
 
 	std::vector<LodInfo> lods;
 	std::vector<std::vector<short>> lodMap;
+
+	Tree* tree;
 };
 

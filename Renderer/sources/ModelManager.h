@@ -7,7 +7,6 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "ShaderManager.h"
 #include "MaterialManager.h"
 
 #include "Model.h"

@@ -1,15 +1,15 @@
 #pragma once
 #include "../Model.h"
 
-class Cube : public Model{
+class Tree : public Model{
 public:
-	Cube();
+	Tree();
 	void CreateVAO() override;
 	void Draw(Shader* MyShader = nullptr) override;
 	void DrawEdges();
-	~Cube();
+	~Tree();
 
 private:
-	GLuint VbPos, VbCol, VbMat;
+	GLuint VbPos, VbCol, VbMat, VbNorm, VbUV;
 };
 

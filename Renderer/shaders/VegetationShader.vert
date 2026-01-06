@@ -4,6 +4,7 @@ layout(location=0) in vec4 in_Position;
 layout(location=1) in vec3 in_Color;
 layout(location=2) in vec3 in_Normal;
 layout(location=3) in vec2 in_UVs;
+layout(location=4) in mat4 in_instancedModelMatrix;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -79,39 +80,38 @@ float perlinFBM(
 
 void main(void)
 {
-    vec4 position;
 
-    if(usingNoise == 1){
-        vec4 worldPos = modelMatrix * in_Position;
-        
+     vec4 position;
+
+    if (usingNoise == 1) {
+        vec4 worldPos = modelMatrix * in_instancedModelMatrix * in_Position;
         vec2 uv = worldPos.xy * noiseScale;
 
-        float noise = perlinFBM(
-            uv,
-            5,      // octaves
-            1.0,    // frequency
-            2.0,    // amplitude
-            2.0,    // lacunarity
-            0.5     // gain
-        );
-
+        float noise = perlinFBM(uv, 5, 1.0, 2.0, 2.0, 0.5);
         noise = noise * 0.5 + 0.5;
-   
-        vec4 displacedPosition = in_Position;
-        displacedPosition.z = -noise * maxHeight;
 
+        // Threshold check
+        if (noise < 0.6) {
+            gl_Position = vec4(0.0, 0.0, 9999.0, 1.0);
+            ex_Color = vec3(0.0);
+            frag_Position = vec3(0.0);
+            frag_Normal = vec3(0.0);
+            in_ViewPos = viewPos;
+            return;
+        }
+
+        vec4 displacedPosition = in_instancedModelMatrix * in_Position;
+        displacedPosition.z -= noise * maxHeight;
         position = projectionMatrix * viewMatrix * modelMatrix * displacedPosition;
-        
-        ex_Color = vec3(noise);
+
+    } else {
+        position = projectionMatrix * viewMatrix * modelMatrix * in_instancedModelMatrix * in_Position;
     }
-    else{
-        position = projectionMatrix * viewMatrix * modelMatrix * in_Position;
-        ex_Color = in_Color;
-    }
-    
+
     gl_Position = position;
-    frag_Position = vec3(in_Position);
-    frag_Normal = normalize(in_Normal);
+    frag_Position = vec3(in_instancedModelMatrix * in_Position);
+    frag_Normal = normalize(mat3(in_instancedModelMatrix) * in_Normal);
     in_ViewPos = viewPos;
+    ex_Color = in_Color;
    
 }

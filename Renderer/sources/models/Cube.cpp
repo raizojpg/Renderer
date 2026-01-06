@@ -87,7 +87,7 @@ void Cube::CreateVAO(){
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }
 
-void Cube::Draw(){
+void Cube::Draw(Shader* MyShader){
 	this->Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, INSTANCE_COUNT);
 }

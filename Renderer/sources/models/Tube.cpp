@@ -67,7 +67,7 @@ void Tube::CreateVAO()
 
 }
 
-void Tube::Draw(){
+void Tube::Draw(Shader* MyShader){
 	this->Bind();
 	for (int patr = 0; patr < NR_VF; patr++)
 	{
