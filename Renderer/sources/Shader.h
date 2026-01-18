@@ -7,6 +7,7 @@
 
 #include "MaterialManager.h"
 #include "LightManager.h"
+#include "Variables.h"
 
 class Shader
 {

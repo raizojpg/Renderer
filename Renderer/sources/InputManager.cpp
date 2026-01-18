@@ -18,16 +18,16 @@ void InputManager::ProcessNormalKeys(unsigned char key, int x, int y) {
 		MyCamera.distR() -= zoom;
 		break;
 	case 'w':
-		MyCamera.MoveForward(speed);
+		MyCamera.MoveForward(vSpeed);
 		break;
 	case 's':
-		MyCamera.MoveBackward(speed);
+		MyCamera.MoveBackward(vSpeed);
 		break;
 	case 'a':
-		MyCamera.MoveLeft(speed);
+		MyCamera.MoveLeft(vSpeed);
 		break;
 	case 'd':
-		MyCamera.MoveRight(speed);
+		MyCamera.MoveRight(vSpeed);
 		break;
 	case 'q':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -75,7 +75,7 @@ void InputManager::ProcessSpecialKeys(int key, int x, int y) {
 }
 
 void InputManager::MouseButton(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON) {
+	if (button == GLUT_RIGHT_BUTTON) {
 		if (state == GLUT_DOWN) {
 			isDragging = true;
 			lastMouseX = x;

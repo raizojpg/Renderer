@@ -11,8 +11,13 @@ uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 
 uniform int usingNoise;
-uniform float maxHeight;
-uniform float noiseScale;
+uniform float uMaxHeight;
+uniform float uNoiseScale;
+uniform int uOctaves;
+uniform float uFrequency;
+uniform float uAmplitude;
+uniform float uLacunarity;
+uniform float uGain;
 
 out vec3 ex_Color;
 out vec3 frag_Position;
@@ -84,21 +89,22 @@ void main(void)
     if(usingNoise == 1){
         vec4 worldPos = modelMatrix * in_Position;
         
-        vec2 uv = worldPos.xy * noiseScale;
+        vec2 uv = worldPos.xy * uNoiseScale;
 
         float noise = perlinFBM(
             uv,
-            5,      // octaves
-            1.0,    // frequency
-            2.0,    // amplitude
-            2.0,    // lacunarity
-            0.5     // gain
+            uOctaves,   
+            uFrequency,    
+            uAmplitude,   
+            uLacunarity,   
+            uGain   
         );
 
         noise = noise * 0.5 + 0.5;
    
         vec4 displacedPosition = in_Position;
-        displacedPosition.z = -noise * maxHeight;
+        displacedPosition.z = -noise * uMaxHeight;
+        //displacedPosition.z = 0;
 
         position = projectionMatrix * viewMatrix * modelMatrix * displacedPosition;
         

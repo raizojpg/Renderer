@@ -134,7 +134,7 @@ xcopy /y /d "$(ProjectDir)lib\x32\SOIL\*.dll" "$(OutDir)" &amp;</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/include;%(AdditionalIncludeDirectories);imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -162,6 +162,7 @@ cd "$(ProjectDir)/lib/x64/SOIL" &amp; xcopy /c /y *.dll *.lib</Command>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>;imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -177,6 +178,13 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_glut.cpp" />
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sources\Camera.cpp" />
@@ -193,11 +201,21 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="sources\Shader.cpp" />
     <ClCompile Include="sources\ShaderManager.cpp" />
     <ClCompile Include="sources\Terrain.cpp" />
+    <ClCompile Include="sources\Variables.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\imageloader.cpp" />
     <ClCompile Include="src\loadShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_glut.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\GLFW\glfw3.h" />
     <ClInclude Include="include\GLFW\glfw3native.h" />
@@ -510,6 +528,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="sources\Shader.h" />
     <ClInclude Include="sources\ShaderManager.h" />
     <ClInclude Include="sources\Terrain.h" />
+    <ClInclude Include="sources\Variables.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt" />

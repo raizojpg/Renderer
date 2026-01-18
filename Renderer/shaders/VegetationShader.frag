@@ -25,13 +25,12 @@ struct Light
 
 uniform Material materialShader;
 uniform Light lightShader;
-uniform vec3 obsShader;
 
 out vec3 out_Color;
 
 vec3 result;
-float fogStart = 30000.0;
-float fogEnd = 50000.0;
+uniform float uFogStart;
+uniform float uFogEnd;
 vec3 fogColor = vec3(0.7, 0.7, 0.7);
 
 void main(void)
@@ -61,7 +60,7 @@ void main(void)
     diffCoeff = max(dot(s_normal, lightDir), 0.0);
     vec3 diffuse_term = diffCoeff * lightShader.diffuse * materialShader.diffuse;
 
-    viewDir = normalize(obsShader - positionVertex3D);
+    viewDir = normalize(in_ViewPos - positionVertex3D);
 
     //Phong
     //reflectDir = normalize(reflect(-lightDir, s_normal));
@@ -83,7 +82,7 @@ void main(void)
     result = clamp(phongColor + ex_Color, 0.0, 1.0);
 
     float distance = length(in_ViewPos - frag_Position);
-    float fogFactor = clamp((fogEnd - distance) / (fogEnd - fogStart), 0.0, 1.0);
+    float fogFactor = clamp((uFogEnd - distance) / (uFogEnd - uFogStart), 0.0, 1.0);
 
     out_Color = mix(fogColor, result, fogFactor);
 

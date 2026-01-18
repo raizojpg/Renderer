@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.h"
+#include "Variables.h"
 
 class InputManager {
 public:

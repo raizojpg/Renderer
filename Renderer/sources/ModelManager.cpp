@@ -5,7 +5,7 @@
 ModelManager::ModelManager() {
 	MySphere = new Sphere(20, 10, 100);
 	MyCube = new Cube();
-	MyTerrain = new Terrain(513, 513, 50);
+	MyTerrain = new Terrain(vTerrainSize + 1, vTerrainSize + 1, vTerrainStep);
 	MySkybox = new Skybox();
 
 	models.push_back(new Sphere(20, 10, 100));

@@ -1,5 +1,5 @@
 #include "Tree.h"
-#define INSTANCE_COUNT 5
+#define INSTANCE_COUNT 64
 
 Tree::Tree(){}
 
@@ -69,9 +69,9 @@ void Tree::CreateVAO(){
 	glm::vec3 Colors[INSTANCE_COUNT];
 	for (int instID = 0; instID < INSTANCE_COUNT; instID++)
 	{
-		Colors[instID][0] = 0.7f + 0.1f * sinf(instID * 1.2f);
-		Colors[instID][1] = 0.7f + 0.1f * sinf(instID * 1.5f + 1.0f); 
-		Colors[instID][2] = 0.7f + 0.1f * sinf(instID * 1.8f + 2.0f);
+		Colors[instID][0] = 0.7f + 0.1f * sinf(instID % 10 * 1.2f);
+		Colors[instID][1] = 0.7f + 0.1f * sinf(instID % 10 * 1.5f + 1.0f);
+		Colors[instID][2] = 0.7f + 0.1f * sinf(instID % 10 * 1.8f + 2.0f);
 	}
 
 	glm::mat4 MatModel[INSTANCE_COUNT];
@@ -79,12 +79,12 @@ void Tree::CreateVAO(){
 	{
 		MatModel[instID] =
 			glm::translate(glm::mat4(1.0f), glm::vec3(
-				180 * instID * cos(instID * 1.7f), 
-				180 * instID * sin(instID * 2.3f), 
+				180 * instID * cos(instID % 10 * 1.7f),
+				180 * instID * sin(instID % 10 * 2.3f),
 				-400))
-			* glm::rotate(glm::mat4(1.0f), ((instID + 1) * PI / 100), glm::vec3(1, 0, 0))
-			* glm::rotate(glm::mat4(1.0f), (instID * PI / 60), glm::vec3(0, 1, 0))    
-			* glm::rotate(glm::mat4(1.0f), (3 * instID * PI / 20), glm::vec3(0, 0, 1));
+			* glm::rotate(glm::mat4(1.0f), ((instID % 10 + 1) * PI / 100), glm::vec3(1, 0, 0))
+			* glm::rotate(glm::mat4(1.0f), (instID % 10 * PI / 60), glm::vec3(0, 1, 0))
+			* glm::rotate(glm::mat4(1.0f), (3 * instID % 10 * PI / 20), glm::vec3(0, 0, 1));
 	}
 
 	GLuint Indices[] =
@@ -152,7 +152,8 @@ void Tree::CreateVAO(){
 
 void Tree::Draw(Shader* MyShader){
 	this->Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, 36 + 36, GL_UNSIGNED_INT, 0, INSTANCE_COUNT);
+	int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
+	glDrawElementsInstanced(GL_TRIANGLES, 36 + 36, GL_UNSIGNED_INT, 0, count);
 }
 
 void Tree::DrawEdges(){

@@ -12,8 +12,14 @@ uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 
 uniform int usingNoise;
-uniform float maxHeight;
-uniform float noiseScale;
+uniform float uMaxHeight;
+uniform float uNoiseScale;
+uniform int uOctaves;
+uniform float uFrequency;
+uniform float uAmplitude;
+uniform float uLacunarity;
+uniform float uGain;
+uniform float uTreeTreshold;
 
 out vec3 ex_Color;
 out vec3 frag_Position;
@@ -82,16 +88,25 @@ void main(void)
 {
 
      vec4 position;
+     vec3 frag;
 
     if (usingNoise == 1) {
         vec4 worldPos = modelMatrix * in_instancedModelMatrix * in_Position;
-        vec2 uv = worldPos.xy * noiseScale;
+        vec2 uv = worldPos.xy * uNoiseScale;
 
-        float noise = perlinFBM(uv, 5, 1.0, 2.0, 2.0, 0.5);
+        float noise = perlinFBM(
+            uv,
+            uOctaves,   
+            uFrequency,    
+            uAmplitude,   
+            uLacunarity,   
+            uGain   
+        );
+
         noise = noise * 0.5 + 0.5;
 
         // Threshold check
-        if (noise < 0.6) {
+        if (noise < uTreeTreshold) {
             gl_Position = vec4(0.0, 0.0, 9999.0, 1.0);
             ex_Color = vec3(0.0);
             frag_Position = vec3(0.0);
@@ -101,17 +116,25 @@ void main(void)
         }
 
         vec4 displacedPosition = in_instancedModelMatrix * in_Position;
-        displacedPosition.z -= noise * maxHeight;
+        displacedPosition.z -= noise * uMaxHeight;
+        //displacedPosition.z += 0;
+        
         position = projectionMatrix * viewMatrix * modelMatrix * displacedPosition;
+        frag = vec3( modelMatrix * displacedPosition);
+  
 
     } else {
         position = projectionMatrix * viewMatrix * modelMatrix * in_instancedModelMatrix * in_Position;
+        frag = vec3( modelMatrix * in_instancedModelMatrix * in_Position);
     }
 
     gl_Position = position;
-    frag_Position = vec3(in_instancedModelMatrix * in_Position);
-    frag_Normal = normalize(mat3(in_instancedModelMatrix) * in_Normal);
+    
+    frag_Position = frag; 
+    mat3 normalMat = transpose(inverse(mat3(modelMatrix * in_instancedModelMatrix)));
+    frag_Normal = normalize(normalMat * in_Normal);
+    
     in_ViewPos = viewPos;
     ex_Color = in_Color;
-   
+  
 }

@@ -15,18 +15,25 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	Shader& MyShader = MyTerrainShaderNoise;
 	
 	MyShader.updateLight(MyLight);
-	MyShader.setUniformVec3("obsShader", MyCamera.getObs());
+	MyShader.setUniformVec3("viewPos", glm::vec4(MyCamera.getObs(), 0) - MyTerrain.getTerrainMat()[3]);
 	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
 	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
-	MyShader.setUniformVec3("viewPos", glm::vec4(MyCamera.getObs(), 0) - MyTerrain.getTerrainMat()[3]);
 	
 	MyShader.setUniformMat4("modelMatrix", MyTerrain.getTerrainMat());
 	MyShader.setUniformInt("codCol", 0);
 	MyShader.updateMaterial(MyTerrain.getMaterial());
 
 	MyShader.setUniformInt("usingNoise", 1);
-	MyShader.setUniformFloat("maxHeight", MyTerrain.getMaxHeight());
-	MyShader.setUniformFloat("noiseScale", 0.00015f);
+	MyShader.setUniformFloat("uMaxHeight", MyTerrain.getMaxHeight());
+	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
+	MyShader.setUniformInt("uOctaves", vOctaves);
+	MyShader.setUniformFloat("uFrequency", vFrequency);
+	MyShader.setUniformFloat("uAmplitude", vAmplitude);
+	MyShader.setUniformFloat("uLacunarity", vLacunarity);
+	MyShader.setUniformFloat("uGain", vGain);
+
+	MyShader.setUniformFloat("uFogStart", vFogStart);
+	MyShader.setUniformFloat("uFogEnd", vFogEnd);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, MyTerrain.getHeightmapTex());
@@ -39,18 +46,28 @@ void ShaderManager::UpdateVegetation(Terrain& MyTerrain, Camera& MyCamera, Light
 	Shader& MyShader = MyVegetationShader;
 
 	MyShader.updateLight(MyLight);
-	MyShader.setUniformVec3("obsShader", MyCamera.getObs());
+	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	MyShader.setUniformMat4("viewMatrix", MyCamera.getView());
 	MyShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
-	MyShader.setUniformVec3("viewPos", glm::vec4(MyCamera.getObs(), 0) - MyTerrain.getTerrainMat()[3]);
 
 	MyShader.setUniformMat4("modelMatrix", MyTerrain.getTerrainMat());
 	MyShader.setUniformInt("codCol", 0);
 	MyShader.updateMaterial(MyTerrain.getMaterial());
 
 	MyShader.setUniformInt("usingNoise", 1);
-	MyShader.setUniformFloat("maxHeight", MyTerrain.getMaxHeight());
-	MyShader.setUniformFloat("noiseScale", 0.00015f);
+	MyShader.setUniformFloat("uMaxHeight", MyTerrain.getMaxHeight());
+	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
+	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
+	MyShader.setUniformInt("uOctaves", vOctaves);
+	MyShader.setUniformFloat("uFrequency", vFrequency);
+	MyShader.setUniformFloat("uAmplitude", vAmplitude);
+	MyShader.setUniformFloat("uLacunarity", vLacunarity);
+	MyShader.setUniformFloat("uGain", vGain);
+	MyShader.setUniformFloat("uTreeTreshold", vTreeTreshold);
+
+	MyShader.setUniformFloat("uFogStart", vFogStart);
+	MyShader.setUniformFloat("uFogEnd", vFogEnd);
+
 }
 
 

@@ -4,15 +4,16 @@
 #include "SOIL.h"
 
 Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l }, step{s} {
-	maxHeight = 2550;
+	maxHeight = vMaxHeight;
 	terrainMat = glm::translate(glm::mat4(1.0f), glm::vec3(-(w-1) * s / 2, -(l-1) * s / 2, 2000));
 	srand(static_cast<unsigned>(time(0)));
 
-	patchSize = 33;
-	maxLod = 5;
+	patchSize = vPatchSize;
+    maxLod = std::min(vMaxLod, static_cast<int>(std::log2(vPatchSize)));
 
-	lodMap = std::vector<std::vector<short>>(WIDTH / (patchSize-1), std::vector<short>(LENGTH / (patchSize-1), 0));
-
+	int patchesX = (WIDTH - 1) / patchSize;
+	int patchesY = (LENGTH - 1) / patchSize;
+	lodMap = std::vector<std::vector<short>>(patchesX, std::vector<short>(patchesY, 0));
 	tree = new Tree();
 }
 
@@ -22,7 +23,7 @@ void Terrain::CreateVAO(){
 	std::vector<glm::vec3> Colors(NR_VF);
 	std::vector<glm::vec3> Normals(NR_VF);
 	std::vector<glm::vec2> UVs(NR_VF);
-	std::vector<GLushort> Indices(3 * 2 * (patchSize - 1) * (patchSize - 1) * 2);
+	std::vector<GLuint> Indices(3 * 2 * patchSize * patchSize * 2);
 
 	int v_idx, t_idx = 0;
 	float x, y, z;
@@ -58,7 +59,7 @@ void Terrain::CreateVAO(){
 		step *= 2; 
 		// border for higher lod
 		lod.border[1][0].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
+		for (int k = 0; k < patchSize; k += step) {
 			Indices[3 * t_idx + 0] = k;
 			Indices[3 * t_idx + 1] = k + step / 2;
 			Indices[3 * t_idx + 2] = (step / 4) * LENGTH + k + step / 4;
@@ -70,31 +71,31 @@ void Terrain::CreateVAO(){
 		}
 		lod.border[1][0].count = t_idx - lod.border[1][0].start;
 		lod.border[1][1].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
-			Indices[3 * t_idx + 0] = k * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 2] = (k + step / 4) * LENGTH + patchSize - 1 - step / 4;
+		for (int k = 0; k < patchSize; k += step) {
+			Indices[3 * t_idx + 0] = k * LENGTH + patchSize;
+			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH + patchSize;
+			Indices[3 * t_idx + 2] = (k + step / 4) * LENGTH + patchSize - step / 4;
 			t_idx++;
-			Indices[3 * t_idx + 0] = (k + step / 2) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 1] = (k + step) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 2] = (k + 3 * step / 4) * LENGTH + patchSize - 1 - step / 4;
+			Indices[3 * t_idx + 0] = (k + step / 2) * LENGTH + patchSize;
+			Indices[3 * t_idx + 1] = (k + step) * LENGTH + patchSize;
+			Indices[3 * t_idx + 2] = (k + 3 * step / 4) * LENGTH + patchSize - step / 4;
 			t_idx++;
 		}
 		lod.border[1][1].count = t_idx - lod.border[1][1].start;
 		lod.border[1][2].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
-			Indices[3 * t_idx + 0] = (patchSize - 1) * LENGTH + k + step;
-			Indices[3 * t_idx + 1] = (patchSize - 1) * LENGTH + k + step / 2;
-			Indices[3 * t_idx + 2] = (patchSize - 1 - step / 4) * LENGTH + k + 3 * step / 4;
+		for (int k = 0; k < patchSize; k += step) {
+			Indices[3 * t_idx + 0] = patchSize * LENGTH + k + step;
+			Indices[3 * t_idx + 1] = patchSize * LENGTH + k + step / 2;
+			Indices[3 * t_idx + 2] = (patchSize - step / 4) * LENGTH + k + 3 * step / 4;
 			t_idx++;
-			Indices[3 * t_idx + 0] = (patchSize - 1) * LENGTH + k + step / 2;
-			Indices[3 * t_idx + 1] = (patchSize - 1) * LENGTH + k;
-			Indices[3 * t_idx + 2] = (patchSize - 1 - step / 4) * LENGTH + k + step / 4;
+			Indices[3 * t_idx + 0] = patchSize * LENGTH + k + step / 2;
+			Indices[3 * t_idx + 1] = patchSize * LENGTH + k;
+			Indices[3 * t_idx + 2] = (patchSize - step / 4) * LENGTH + k + step / 4;
 			t_idx++;
 		}
 		lod.border[1][2].count = t_idx - lod.border[1][2].start;
 		lod.border[1][3].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
+		for (int k = 0; k < patchSize; k += step) {
 			Indices[3 * t_idx + 0] = (k + step) * LENGTH;
 			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH;
 			Indices[3 * t_idx + 2] = (k + 3 * step / 4) * LENGTH + step / 4;
@@ -109,7 +110,7 @@ void Terrain::CreateVAO(){
 		step /= 2; 
 		//border for current lod
 		lod.border[0][0].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
+		for (int k = 0; k < patchSize; k += step) {
 			Indices[3 * t_idx + 0] = k;
 			Indices[3 * t_idx + 1] = k + step / 2;
 			Indices[3 * t_idx + 2] = (step / 2) * LENGTH + k + step / 2;
@@ -121,31 +122,31 @@ void Terrain::CreateVAO(){
 		}
 		lod.border[0][0].count = t_idx - lod.border[0][0].start;
 		lod.border[0][1].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
-			Indices[3 * t_idx + 0] = k * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 2] = (k + step / 2) * LENGTH + patchSize - 1 - step / 2;
+		for (int k = 0; k < patchSize; k += step) {
+			Indices[3 * t_idx + 0] = k * LENGTH + patchSize;
+			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH + patchSize;
+			Indices[3 * t_idx + 2] = (k + step / 2) * LENGTH + patchSize - step / 2;
 			t_idx++;
-			Indices[3 * t_idx + 0] = (k + step / 2) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 1] = (k + step) * LENGTH + patchSize - 1;
-			Indices[3 * t_idx + 2] = (k + step / 2) * LENGTH + patchSize - 1 - step / 2;
+			Indices[3 * t_idx + 0] = (k + step / 2) * LENGTH + patchSize;
+			Indices[3 * t_idx + 1] = (k + step) * LENGTH + patchSize;
+			Indices[3 * t_idx + 2] = (k + step / 2) * LENGTH + patchSize - step / 2;
 			t_idx++;
 		}
 		lod.border[0][1].count = t_idx - lod.border[0][1].start;
 		lod.border[0][2].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
-			Indices[3 * t_idx + 0] = (patchSize - 1) * LENGTH + k + step;
-			Indices[3 * t_idx + 1] = (patchSize - 1) * LENGTH + k + step / 2;
-			Indices[3 * t_idx + 2] = (patchSize - 1 - step / 2) * LENGTH + k + step / 2;
+		for (int k = 0; k < patchSize; k += step) {
+			Indices[3 * t_idx + 0] = patchSize * LENGTH + k + step;
+			Indices[3 * t_idx + 1] = patchSize * LENGTH + k + step / 2;
+			Indices[3 * t_idx + 2] = (patchSize - step / 2) * LENGTH + k + step / 2;
 			t_idx++;
-			Indices[3 * t_idx + 0] = (patchSize - 1) * LENGTH + k + step / 2;
-			Indices[3 * t_idx + 1] = (patchSize - 1) * LENGTH + k;
-			Indices[3 * t_idx + 2] = (patchSize - 1 - step / 2) * LENGTH + k + step / 2;
+			Indices[3 * t_idx + 0] = patchSize * LENGTH + k + step / 2;
+			Indices[3 * t_idx + 1] = patchSize * LENGTH + k;
+			Indices[3 * t_idx + 2] = (patchSize - step / 2) * LENGTH + k + step / 2;
 			t_idx++;
 		}
 		lod.border[0][2].count = t_idx - lod.border[0][2].start;
 		lod.border[0][3].start = t_idx;
-		for (int k = 0; k < patchSize - 1; k += step) {
+		for (int k = 0; k < patchSize; k += step) {
 			Indices[3 * t_idx + 0] = (k + step) * LENGTH;
 			Indices[3 * t_idx + 1] = (k + step / 2) * LENGTH;
 			Indices[3 * t_idx + 2] = (k + step / 2) * LENGTH + step / 2;
@@ -159,8 +160,8 @@ void Terrain::CreateVAO(){
 	
 		// center of the patch for the current lod
 		lod.center.start = t_idx;
-		for (int i = 0; i < patchSize - 1; i += step) {
-			for (int j = 0; j < patchSize - 1; j += step) {
+		for (int i = 0; i < patchSize; i += step) {
+			for (int j = 0; j < patchSize; j += step) {
 				//skipping the border
 				if (i != 0) {
 					Indices[3 * t_idx + 0] = i * LENGTH + j;
@@ -172,7 +173,7 @@ void Terrain::CreateVAO(){
 					Indices[3 * t_idx + 2] = (i + step / 2) * LENGTH + j + step / 2;
 					t_idx++;
 				}
-				if (j != patchSize - 1 - step) {
+				if (j != patchSize - step) {
 					Indices[3 * t_idx + 0] = i * LENGTH + j + step;
 					Indices[3 * t_idx + 1] = (i + step / 2) * LENGTH + j + step;
 					Indices[3 * t_idx + 2] = (i + step / 2) * LENGTH + j + step / 2;
@@ -182,7 +183,7 @@ void Terrain::CreateVAO(){
 					Indices[3 * t_idx + 2] = (i + step) * LENGTH + j + step;
 					t_idx++;
 				}
-				if (i != patchSize - 1 - step) {
+				if (i != patchSize - step) {
 					Indices[3 * t_idx + 0] = (i + step / 2) * LENGTH + j + step / 2;
 					Indices[3 * t_idx + 1] = (i + step) * LENGTH + j + step / 2;
 					Indices[3 * t_idx + 2] = (i + step) * LENGTH + j;
@@ -230,7 +231,7 @@ void Terrain::CreateVAO(){
 		UVs.size() * sizeof(glm::vec2), UVs.data());
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(GLushort), Indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(GLuint), Indices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(0));
@@ -245,39 +246,39 @@ void Terrain::CreateVAO(){
 
 void Terrain::Draw(Shader* MyShader){
 	this->Bind();
-	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
-		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
+	for (int i = 0; i < WIDTH - 1; i += patchSize) {
+		for (int j = 0; j < LENGTH - 1; j += patchSize) {
 			int baseVertex = i * (LENGTH) + j;
 
-			int ii = i / (patchSize - 1);
-			int jj = j / (patchSize - 1);
+			int ii = i / patchSize;
+			int jj = j / patchSize;
 			int lod = lodMap[ii][jj];
 
 			int nlod = (ii - 1 >= 0) ? lodMap[ii - 1][jj] : lod;
 			nlod = (nlod > lod) ? nlod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[nlod][0].count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].border[nlod][0].start * sizeof(GLushort)), baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[nlod][0].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[nlod][0].start * sizeof(GLuint)), baseVertex);
 			
-			int elod = (jj + 1 < LENGTH / (patchSize-1)) ? lodMap[ii][jj + 1] : lod;
+			int elod = (jj + 1 < LENGTH / patchSize) ? lodMap[ii][jj + 1] : lod;
 			elod = (elod > lod) ? elod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[elod][1].count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].border[elod][1].start * sizeof(GLushort)), baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[elod][1].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[elod][1].start * sizeof(GLuint)), baseVertex);
 			
-			int slod = (ii + 1 < WIDTH / (patchSize-1)) ? lodMap[ii + 1][jj] : lod;
+			int slod = (ii + 1 < WIDTH / patchSize) ? lodMap[ii + 1][jj] : lod;
 			slod = (slod > lod) ? slod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[slod][2].count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].border[slod][2].start * sizeof(GLushort)), baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[slod][2].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[slod][2].start * sizeof(GLuint)), baseVertex);
 			
 			int wlod = (jj - 1 >= 0) ? lodMap[ii][jj - 1] : lod;
 			wlod = (wlod > lod) ? wlod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[wlod][3].count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].border[wlod][3].start * sizeof(GLushort)), baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[wlod][3].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[wlod][3].start * sizeof(GLuint)), baseVertex);
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].center.count, GL_UNSIGNED_SHORT, (GLvoid*)(3 * lods[lod].center.start * sizeof(GLushort)), baseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].center.count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].center.start * sizeof(GLuint)), baseVertex);
 			
 		}
 	}
 }
 
 void Terrain::DrawVegetation(Shader* MyShader){
-	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
-		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
+	for (int i = 0; i < WIDTH - 1; i += patchSize) {
+		for (int j = 0; j < LENGTH - 1; j += patchSize) {
 			float x = i * step + (patchSize / 2) * step;
 			float y = j * step + (patchSize / 2) * step;
 			float z = 0.0f;
@@ -325,31 +326,31 @@ void Terrain::updateLodMap(glm::vec3 observer){
 	float y = obs.y;
 	float z = obs.z;
 
-	int patchX = int(x) / (patchSize * step);
-	int patchY = int(y) / (patchSize * step);
+	int patchX = int(std::floor(x / (patchSize * step)));
+	int patchY = int(std::floor(y / (patchSize * step)));
 
-	if (patchX < (WIDTH - 1) / (patchSize - 1) / 2) {
+	if (patchX < (WIDTH - 1) / patchSize / 2) {
 		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(-patchSize * step, 0, 0));
 	}
-	else if (patchX > (WIDTH - 1) / (patchSize - 1) / 2) {
+	else if (patchX > (WIDTH - 1) / patchSize / 2) {
 		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(patchSize * step, 0, 0));
 	}
-	if (patchY < (LENGTH - 1) / (patchSize - 1) / 2) {
+	if (patchY < (LENGTH - 1) / patchSize / 2) {
 		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, -patchSize * step, 0));
 	}
-	else if (patchY > (LENGTH - 1) / (patchSize - 1) / 2) {
+	else if (patchY > (LENGTH - 1) / patchSize / 2) {
 		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, patchSize * step, 0));
 	}
 
 	//std::cout << patchX << "  " << patchY << std::endl;
 	
-	for (int i = 0; i < WIDTH - 1; i += (patchSize - 1)) {
-		for (int j = 0; j < LENGTH - 1; j += (patchSize - 1)) {
+	for (int i = 0; i < WIDTH - 1; i += patchSize) {
+		for (int j = 0; j < LENGTH - 1; j += patchSize) {
 			float midi = (i + patchSize / 2) * step;
 			float midj = (j + patchSize / 2) * step;
 			float distance = glm::sqrt((midi - x) * (midi - x) + (midj - y) * (midj - y));
-			short lod = std::min(int(distance) / step / patchSize / 2, maxLod - 1);
-			lodMap[int(i / (patchSize - 1))][int(j / (patchSize - 1))] = lod;
+			short lod = std::min(int(distance) / step / patchSize / vLodDistribution, maxLod - 1);
+			lodMap[int(i / patchSize)][int(j / patchSize)] = lod;
 			//std::cout << lod << " ";
 		}
 		//std::cout << std::endl;
