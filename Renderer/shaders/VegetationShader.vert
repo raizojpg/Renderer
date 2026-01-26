@@ -91,8 +91,8 @@ void main(void)
      vec3 frag;
 
     if (usingNoise == 1) {
-        vec4 worldPos = modelMatrix * in_instancedModelMatrix * in_Position;
-        vec2 uv = worldPos.xy * uNoiseScale;
+        vec3 instWorldPos = (modelMatrix * in_instancedModelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+        vec2 uv = instWorldPos.xy * uNoiseScale;
 
         float noise = perlinFBM(
             uv,
@@ -107,11 +107,7 @@ void main(void)
 
         // Threshold check
         if (noise < uTreeTreshold) {
-            gl_Position = vec4(0.0, 0.0, 9999.0, 1.0);
-            ex_Color = vec3(0.0);
-            frag_Position = vec3(0.0);
-            frag_Normal = vec3(0.0);
-            in_ViewPos = viewPos;
+            gl_Position = vec4(2.0, 2.0, 2.0, 1.0); // move it outside the clip space
             return;
         }
 

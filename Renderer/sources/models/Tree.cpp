@@ -1,174 +1,172 @@
 #include "Tree.h"
+#include "../LSystem.h"
+#include "../MeshBuilder.h"
+
 #define INSTANCE_COUNT 64
 
-Tree::Tree(){}
-
-void Tree::CreateVAO(){
-
-	GLfloat Vertices[] =
-	{                		
-		0.0f,   0.0f,   0.0f,   1.0f,  
-		20.0f,  0.0f,   0.0f,   1.0f,  
-		20.0f,  0.0f, 400.0f,   1.0f,  
-		0.0f,   0.0f, 400.0f,   1.0f,   
-		0.0f,  20.0f,   0.0f,   1.0f,  
-		20.0f, 20.0f,   0.0f,   1.0f, 
-		20.0f, 20.0f, 400.0f,   1.0f,   
-		0.0f,  20.0f, 400.0f,   1.0f,  
-
-		-50.0f,  -50.0f, 0.0f, 1.0f,   
-		 70.0f,  -50.0f, 0.0f, 1.0f,  
-		 70.0f,   70.0f, 0.0f, 1.0f,  
-		-50.0f,   70.0f, 0.0f, 1.0f,   
-		-50.0f,  -50.0f, 80.0f, 1.0f,  
-		 70.0f,  -50.0f, 80.0f, 1.0f,  
-		 70.0f,   70.0f, 80.0f, 1.0f,  
-		-50.0f,   70.0f, 80.0f, 1.0f
-	};
-
-	GLfloat Normals[] = {
-		0, 0, -1,
-		0, 0, -1,
-		0, 0, -1,
-		0, 0, -1,
-		0, 0,  1,
-		0, 0,  1,
-		0, 0,  1,
-		0, 0,  1,
-
-		0, 0, -1,
-		0, 0, -1,
-		0, 0, -1,
-		0, 0, -1,
-		0, 0,  1,
-		0, 0,  1,
-		0, 0,  1,
-		0, 0,  1,
-	};
-
-	GLfloat UVs[] = {
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1,
-	};
-
-	glm::vec3 Colors[INSTANCE_COUNT];
-	for (int instID = 0; instID < INSTANCE_COUNT; instID++)
-	{
-		Colors[instID][0] = 0.7f + 0.1f * sinf(instID % 10 * 1.2f);
-		Colors[instID][1] = 0.7f + 0.1f * sinf(instID % 10 * 1.5f + 1.0f);
-		Colors[instID][2] = 0.7f + 0.1f * sinf(instID % 10 * 1.8f + 2.0f);
-	}
-
-	glm::mat4 MatModel[INSTANCE_COUNT];
-	for (int instID = 0; instID < INSTANCE_COUNT; instID++)
-	{
-		MatModel[instID] =
-			glm::translate(glm::mat4(1.0f), glm::vec3(
-				180 * instID * cos(instID % 10 * 1.7f),
-				180 * instID * sin(instID % 10 * 2.3f),
-				-400))
-			* glm::rotate(glm::mat4(1.0f), ((instID % 10 + 1) * PI / 100), glm::vec3(1, 0, 0))
-			* glm::rotate(glm::mat4(1.0f), (instID % 10 * PI / 60), glm::vec3(0, 1, 0))
-			* glm::rotate(glm::mat4(1.0f), (3 * instID % 10 * PI / 20), glm::vec3(0, 0, 1));
-	}
-
-	GLuint Indices[] =
-	{
-		1, 0, 2,   2, 0, 3,
-		2, 3, 6,   6, 3, 7,
-		7, 3, 4,   4, 3, 0,
-		4, 0, 5,   5, 0, 1,
-		1, 2, 5,   5, 2, 6,
-		5, 6, 4,   4, 6, 7,
-		
-		9, 8, 10,   10, 8, 11,      
-		10, 11, 14,  14, 11, 15,   
-		15, 11, 12,  12, 11, 8,     
-		12, 8, 13,   13, 8, 9,     
-		9, 10, 13,   13, 10, 14, 
-		13, 14, 12,  12, 14, 15
-	};
-
-	glGenVertexArrays(1, &VaoId);
-	glBindVertexArray(VaoId);
-
-	glGenBuffers(1, &VbPos);	
-	glBindBuffer(GL_ARRAY_BUFFER, VbPos);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
-
-	glGenBuffers(1, &VbCol);
-	glBindBuffer(GL_ARRAY_BUFFER, VbCol);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
-	glVertexAttribDivisor(1, 1);
-
-	glGenBuffers(1, &VbNorm);
-	glBindBuffer(GL_ARRAY_BUFFER, VbNorm);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Normals), Normals, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-
-	glGenBuffers(1, &VbUV);
-	glBindBuffer(GL_ARRAY_BUFFER, VbUV);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(UVs), UVs, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-
-	glGenBuffers(1, &VbMat);
-	glBindBuffer(GL_ARRAY_BUFFER, VbMat);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(MatModel), MatModel, GL_STATIC_DRAW);
-	for (int i = 0; i < 4; i++)
-	{
-		glEnableVertexAttribArray(4 + i);
-		glVertexAttribPointer(4 + i,
-			4, GL_FLOAT, GL_FALSE,
-			sizeof(glm::mat4),
-			(void*)(sizeof(glm::vec4) * i));
-		glVertexAttribDivisor(4 + i, 1);
-	}
-
-	glGenBuffers(1, &EboId);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+Tree::Tree()
+{
+    IndexCount = 0;
 }
 
-void Tree::Draw(Shader* MyShader){
-	this->Bind();
-	int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
-	glDrawElementsInstanced(GL_TRIANGLES, 36 + 36, GL_UNSIGNED_INT, 0, count);
+void Tree::CreateVAO()
+{
+    // ------------------------------------------------------------
+    // Generate a TREE SKELETON using the L-system
+    // ------------------------------------------------------------
+    TreeGenParams p;
+
+    // X creates branching, F can be expanded to add more segments.
+    p.axiom = "X";
+    p.rules['X'] = "F[&+XX][-XX]FX";
+    p.rules['F'] = "FF";
+
+    p.iterations = 4;
+
+    p.initialLength = 150.0f;  
+    p.initialRadius = 60.0f;
+    p.lengthDecay = 0.95f;
+    p.radiusDecay = 0.94f;
+
+    p.yawDeg = 35.0f;
+    p.pitchDeg = 25.0f;
+    p.rollDeg = 12.0f;
+
+    p.angleJitterDeg = 6.0f;
+    p.branchKeepProbability = 0.9f;
+    p.minRadius = 8.0f;
+
+    uint32_t seed = 1338;
+
+    LSystemTreeGenerator gen;
+    TreeSkeleton skel = gen.generateSkeleton(p, seed);
+
+    // ------------------------------------------------------------
+    // Build a TUBE MESH from that skeleton
+    // ------------------------------------------------------------
+    
+    int radialSides = 3;
+    float uvVScale = 0.02f;
+
+    TreeMeshData mesh = TreeMeshBuilder::BuildFromSkeleton(skel, radialSides, uvVScale);
+    IndexCount = (int)mesh.Indices.size();
+
+    // ------------------------------------------------------------
+    // Create instance colors
+    // ------------------------------------------------------------
+    glm::vec3 Colors[INSTANCE_COUNT];
+    for (int instID = 0; instID < INSTANCE_COUNT; instID++)
+    {
+        Colors[instID][0] = 0.7f + 0.1f * sinf(instID % 10 * 1.2f);
+        Colors[instID][1] = 0.7f + 0.1f * sinf(instID % 10 * 1.5f + 1.0f);
+        Colors[instID][2] = 0.7f + 0.1f * sinf(instID % 10 * 1.8f + 2.0f);
+    }
+
+    // ------------------------------------------------------------
+    // Create instance model matrices
+    // ------------------------------------------------------------
+    glm::mat4 MatModel[INSTANCE_COUNT];
+    for (int instID = 0; instID < INSTANCE_COUNT; instID++)
+    {
+        MatModel[instID] =
+            glm::rotate(glm::mat4(1.0f), glm::pi<float>(), glm::vec3(1, 0, 0))
+            * glm::translate(glm::mat4(1.0f), glm::vec3(
+                180 * instID*3 * cos(instID % 10 * 1.7f),
+                180 * instID*3 * sin(instID % 10 * 2.3f),
+                -100))
+            * glm::rotate(glm::mat4(1.0f), ((instID % 10 + 1) * PI / 100), glm::vec3(1, 0, 0))
+            * glm::rotate(glm::mat4(1.0f), (instID % 10 * PI / 60), glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(1.0f), (3 * instID % 10 * PI / 20), glm::vec3(0, 0, 1));
+    }
+
+    // ------------------------------------------------------------
+    // Create VAO + upload generated mesh buffers to GPU
+    // ------------------------------------------------------------
+    glGenVertexArrays(1, &VaoId);
+    glBindVertexArray(VaoId);
+
+    // Positions VBO (location = 0)
+    glGenBuffers(1, &VbPos);
+    glBindBuffer(GL_ARRAY_BUFFER, VbPos);
+    glBufferData(GL_ARRAY_BUFFER,
+        mesh.Positions.size() * sizeof(glm::vec4),
+        mesh.Positions.data(),
+        GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (GLvoid*)0);
+
+    // Instance Color VBO (location = 1) 
+    glGenBuffers(1, &VbCol);
+    glBindBuffer(GL_ARRAY_BUFFER, VbCol);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
+    glVertexAttribDivisor(1, 1);
+
+    // Normals VBO (location = 2)
+    glGenBuffers(1, &VbNorm);
+    glBindBuffer(GL_ARRAY_BUFFER, VbNorm);
+    glBufferData(GL_ARRAY_BUFFER,
+        mesh.Normals.size() * sizeof(glm::vec3),
+        mesh.Normals.data(),
+        GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
+
+    // UVs VBO (location = 3)
+    glGenBuffers(1, &VbUV);
+    glBindBuffer(GL_ARRAY_BUFFER, VbUV);
+    glBufferData(GL_ARRAY_BUFFER,
+        mesh.UVs.size() * sizeof(glm::vec2),
+        mesh.UVs.data(),
+        GL_STATIC_DRAW);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (GLvoid*)0);
+
+    // Instance Model Matrix VBO (locations = 4,5,6,7)
+    glGenBuffers(1, &VbMat);
+    glBindBuffer(GL_ARRAY_BUFFER, VbMat);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(MatModel), MatModel, GL_STATIC_DRAW);
+
+    for (int i = 0; i < 4; i++){
+        glEnableVertexAttribArray(4 + i);
+        glVertexAttribPointer(4 + i,
+            4, GL_FLOAT, GL_FALSE,
+            sizeof(glm::mat4),
+            (void*)(sizeof(glm::vec4) * i));
+        glVertexAttribDivisor(4 + i, 1);
+    }
+
+    // Index buffer EBO
+    glGenBuffers(1, &EboId);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EboId);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+        mesh.Indices.size() * sizeof(uint32_t),
+        mesh.Indices.data(),
+        GL_STATIC_DRAW);
+
 }
 
-void Tree::DrawEdges(){
-	this->Bind();
-	glLineWidth(2.5);
-	/*glDrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(36 * sizeof(GLuint)), INSTANCE_COUNT);
-	glDrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(40 * sizeof(GLuint)), INSTANCE_COUNT);
-	glDrawElementsInstanced(GL_LINES, 8, GL_UNSIGNED_INT, (void*)(44 * sizeof(GLuint)), INSTANCE_COUNT);*/
+void Tree::Draw(Shader* MyShader)
+{
+    this->Bind();
+    int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
+    glDrawElementsInstanced(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, 0, count);
 }
 
-Tree::~Tree(){
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-	glDeleteBuffers(1, &VbPos);
-	glDeleteBuffers(1, &VbCol);
-	glDeleteBuffers(1, &VbMat);
+Tree::~Tree()
+{
+    glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(0);
+
+    glDeleteBuffers(1, &VbPos);
+    glDeleteBuffers(1, &VbCol);
+    glDeleteBuffers(1, &VbNorm);
+    glDeleteBuffers(1, &VbUV);
+    glDeleteBuffers(1, &VbMat);
+    glDeleteBuffers(1, &EboId);
+
+    glDeleteVertexArrays(1, &VaoId);
 }

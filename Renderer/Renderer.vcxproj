@@ -186,7 +186,9 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
+    <ClCompile Include="LSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshBuilder.cpp" />
     <ClCompile Include="sources\Camera.cpp" />
     <ClCompile Include="sources\InputManager.cpp" />
     <ClCompile Include="sources\LightManager.cpp" />
@@ -513,6 +515,8 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\loadShaders.h" />
     <ClInclude Include="include\SOIL.h" />
+    <ClInclude Include="LSystem.h" />
+    <ClInclude Include="MeshBuilder.h" />
     <ClInclude Include="PerlinNoise.hpp" />
     <ClInclude Include="sources\Camera.h" />
     <ClInclude Include="sources\InputManager.h" />

@@ -14,7 +14,7 @@ int vPatchSize = 64;
 int vMaxLod = 6;
 int vLodDistribution = 2;
 
-int vTreeInstanceCount = 10;
+int vTreeInstanceCount = 3;
 float vTreeTreshold = 0.6;
 
 float vNoiseScale = 0.00015f;

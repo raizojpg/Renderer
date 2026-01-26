@@ -10,6 +10,6 @@ public:
 	~Tree();
 
 private:
-	GLuint VbPos, VbCol, VbMat, VbNorm, VbUV;
+	GLuint VbPos, VbCol, VbMat, VbNorm, VbUV, IndexCount;
 };
 
