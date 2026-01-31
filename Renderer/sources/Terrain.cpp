@@ -14,11 +14,10 @@ Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l },
 	int patchesX = (WIDTH - 1) / patchSize;
 	int patchesY = (LENGTH - 1) / patchSize;
 	lodMap = std::vector<std::vector<short>>(patchesX, std::vector<short>(patchesY, 0));
-	tree = new Tree();
+	vegetation.lodMap = lodMap;
 }
 
 void Terrain::CreateVAO(){
-	tree->CreateVAO();
 	std::vector<glm::vec4> Vertices(NR_VF);
 	std::vector<glm::vec3> Colors(NR_VF);
 	std::vector<glm::vec3> Normals(NR_VF);
@@ -283,9 +282,28 @@ void Terrain::DrawVegetation(Shader* MyShader){
 			float y = j * step + (patchSize / 2) * step;
 			float z = 0.0f;
 
+			int ii = i / patchSize;
+			int jj = j / patchSize;
+			int lod = vegetation.lodMap[ii][jj];
+
 			glm::mat4 model = terrainMat * glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
 			MyShader->setUniformMat4("modelMatrix", model);
-			tree->Draw();
+            
+			MyShader->setUniformFloat("uLowerTreeTreshold", vUpperTreeTreshold);
+			MyShader->setUniformFloat("uUpperTreeTreshold", 1.0);
+			int lodA = std::min(int(vegetation.treesTypeA.size()) - 1, lod);
+			vegetation.treesTypeA[lodA]->Draw();
+
+			MyShader->setUniformFloat("uLowerTreeTreshold", 0.0);
+			MyShader->setUniformFloat("uUpperTreeTreshold", vLowerTreeTreshold);
+			int lodB = std::min(int(vegetation.treesTypeB.size()) - 1, lod);
+			vegetation.treesTypeB[lodB]->Draw();
+
+			MyShader->setUniformFloat("uLowerTreeTreshold", vLowerTreeTreshold);
+			MyShader->setUniformFloat("uUpperTreeTreshold", vUpperTreeTreshold);
+			int lodC = std::min(int(vegetation.treesTypeC.size()) - 1, lod);
+			vegetation.treesTypeC[lodC]->Draw();
+			
 		}
 	}
 }
@@ -349,8 +367,9 @@ void Terrain::updateLodMap(glm::vec3 observer){
 			float midi = (i + patchSize / 2) * step;
 			float midj = (j + patchSize / 2) * step;
 			float distance = glm::sqrt((midi - x) * (midi - x) + (midj - y) * (midj - y));
-			short lod = std::min(int(distance) / step / patchSize / vLodDistribution, maxLod - 1);
-			lodMap[int(i / patchSize)][int(j / patchSize)] = lod;
+			int lod = int(distance) / step / patchSize / vLodDistribution;
+			lodMap[int(i / patchSize)][int(j / patchSize)] = std::min(lod, maxLod - 1);
+			vegetation.lodMap[int(i / patchSize)][int(j / patchSize)] = lod;
 			//std::cout << lod << " ";
 		}
 		//std::cout << std::endl;
@@ -368,6 +387,4 @@ Terrain::~Terrain(){
 		SOIL_free_image_data(heightData);
 		heightData = nullptr;
 	}
-
-	delete tree;
 }

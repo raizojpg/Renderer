@@ -1,42 +1,18 @@
 #include "Tree.h"
-#include "../LSystem.h"
-#include "../MeshBuilder.h"
 
 #define INSTANCE_COUNT 64
 
-Tree::Tree()
-{
+Tree::Tree(){
     IndexCount = 0;
 }
 
-void Tree::CreateVAO()
+void Tree::CreateVAO(){}
+
+void Tree::CreateVAO(TreeGenParams& p, int seed)
 {
     // ------------------------------------------------------------
     // Generate a TREE SKELETON using the L-system
     // ------------------------------------------------------------
-    TreeGenParams p;
-
-    // X creates branching, F can be expanded to add more segments.
-    p.axiom = "X";
-    p.rules['X'] = "F[&+XX][-XX]FX";
-    p.rules['F'] = "FF";
-
-    p.iterations = 4;
-
-    p.initialLength = 150.0f;  
-    p.initialRadius = 60.0f;
-    p.lengthDecay = 0.95f;
-    p.radiusDecay = 0.94f;
-
-    p.yawDeg = 35.0f;
-    p.pitchDeg = 25.0f;
-    p.rollDeg = 12.0f;
-
-    p.angleJitterDeg = 6.0f;
-    p.branchKeepProbability = 0.9f;
-    p.minRadius = 8.0f;
-
-    uint32_t seed = 1338;
 
     LSystemTreeGenerator gen;
     TreeSkeleton skel = gen.generateSkeleton(p, seed);

@@ -63,7 +63,6 @@ void ShaderManager::UpdateVegetation(Terrain& MyTerrain, Camera& MyCamera, Light
 	MyShader.setUniformFloat("uAmplitude", vAmplitude);
 	MyShader.setUniformFloat("uLacunarity", vLacunarity);
 	MyShader.setUniformFloat("uGain", vGain);
-	MyShader.setUniformFloat("uTreeTreshold", vTreeTreshold);
 
 	MyShader.setUniformFloat("uFogStart", vFogStart);
 	MyShader.setUniformFloat("uFogEnd", vFogEnd);

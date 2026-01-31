@@ -15,7 +15,8 @@ extern int vMaxLod;
 extern int vLodDistribution;
 
 extern int vTreeInstanceCount;
-extern float vTreeTreshold;
+extern float vLowerTreeTreshold;
+extern float vUpperTreeTreshold;
 
 extern float vNoiseScale;
 extern int vOctaves;

@@ -204,6 +204,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="sources\ShaderManager.cpp" />
     <ClCompile Include="sources\Terrain.cpp" />
     <ClCompile Include="sources\Variables.cpp" />
+    <ClCompile Include="sources\VegetationManager.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\imageloader.cpp" />
     <ClCompile Include="src\loadShaders.cpp" />
@@ -533,6 +534,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="sources\ShaderManager.h" />
     <ClInclude Include="sources\Terrain.h" />
     <ClInclude Include="sources\Variables.h" />
+    <ClInclude Include="sources\VegetationManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="include\glm\CMakeLists.txt" />

@@ -156,7 +156,8 @@ void ShowMyImGuiWindow()
 	// Vegetation
 	ImGui::Text("Vegetation");
 	ImGui::SliderInt("Tree Instance Count", &vTreeInstanceCount, 0, 128);
-	ImGui::SliderFloat("Tree Threshold", &vTreeTreshold, 0.0f, 1.0f);
+	ImGui::SliderFloat("Lower Tree Threshold", &vLowerTreeTreshold, 0.0f, 1.0f);
+	ImGui::SliderFloat("Upper Tree Threshold", &vUpperTreeTreshold, 0.0f, 1.0f);
 
 	ImGui::Separator();
 

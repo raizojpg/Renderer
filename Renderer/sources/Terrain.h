@@ -1,6 +1,6 @@
 #pragma once
 #include "Model.h"
-#include "models/Tree.h"
+#include "VegetationManager.h"
 
 class Terrain : public Model{
 public:
@@ -45,6 +45,6 @@ private:
 	std::vector<LodInfo> lods;
 	std::vector<std::vector<short>> lodMap;
 
-	Tree* tree;
+	VegetationManager vegetation;
 };
 

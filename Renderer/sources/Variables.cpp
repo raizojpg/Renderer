@@ -15,7 +15,8 @@ int vMaxLod = 6;
 int vLodDistribution = 2;
 
 int vTreeInstanceCount = 3;
-float vTreeTreshold = 0.6;
+float vLowerTreeTreshold = 0.35;
+float vUpperTreeTreshold = 0.5;
 
 float vNoiseScale = 0.00015f;
 int vOctaves = 5;

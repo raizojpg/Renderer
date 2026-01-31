@@ -19,7 +19,8 @@ uniform float uFrequency;
 uniform float uAmplitude;
 uniform float uLacunarity;
 uniform float uGain;
-uniform float uTreeTreshold;
+uniform float uLowerTreeTreshold;
+uniform float uUpperTreeTreshold;
 
 out vec3 ex_Color;
 out vec3 frag_Position;
@@ -106,7 +107,7 @@ void main(void)
         noise = noise * 0.5 + 0.5;
 
         // Threshold check
-        if (noise < uTreeTreshold) {
+        if (noise < uLowerTreeTreshold || noise > uUpperTreeTreshold) {
             gl_Position = vec4(2.0, 2.0, 2.0, 1.0); // move it outside the clip space
             return;
         }
