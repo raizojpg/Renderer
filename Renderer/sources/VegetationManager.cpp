@@ -14,13 +14,13 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeA()
     std::vector<std::shared_ptr<Tree>> trees;
     std::shared_ptr<Tree> tree;
     TreeGenParams p;
-    int seed = 1338;
+    int seed = vSeed;
 
     // X creates branching, F can be expanded to add more segments.
     
     // LOD 0
     p.axiom = "X";
-    p.rules['X'] = "F[&+XX][-XX]FX";
+    p.rules['X'] = "F[&+XX][^+XX][-XX]FX";
     p.rules['F'] = "FF";
 
     p.iterations = 4;
@@ -41,7 +41,6 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeA()
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
 	trees.push_back(tree);
-    trees.push_back(tree);
 
 
     // LOD 1
@@ -53,23 +52,21 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeA()
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
 
     // LOD 2
-    p.rules['X'] = "F[&+XX][-XX]FX";
+    p.rules['X'] = "FF[&+XX][-XX]FX";
     p.iterations = 3;
-    p.initialLength = 220.0f;
+    p.initialLength = 180.0f;
 
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
 
 
     // LOD 3
-    p.rules['X'] = "F[&+X][-X]FX";
-    p.iterations = 3;
-    p.initialLength = 220.0f;
+    p.rules['X'] = "FF[&+X][-X]X";
+    p.iterations = 2;
+    p.initialLength = 400.0f;
 
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
@@ -99,11 +96,11 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeB()
     std::vector<std::shared_ptr<Tree>> trees;
     std::shared_ptr<Tree> tree;
     TreeGenParams p;
-    int seed = 1338;
+    int seed = vSeed;
 
     // LOD 0
     p.axiom = "X";
-    p.rules['X'] = "F[&+XFX][-XFX]FX";
+    p.rules['X'] = "F[&+XFX][^+XFX][-XFX]FX";
     p.rules['F'] = "FXF";
 
     p.iterations = 4;
@@ -124,13 +121,12 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeB()
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
     
 
     // LOD 1
     p.rules['X'] = "F[&+XFX][-XFX]FX";
     p.iterations = 4;
-    p.initialLength = 240.0f;
+    p.initialLength = 220.0f;
     p.initialRadius = 80.0f;
     p.lengthDecay = 0.95f;
     p.minRadius = 16.0f;
@@ -138,15 +134,14 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeB()
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
 
 
     // LOD 2
     p.rules['X'] = "F[&+XX][-XX]FX";
     p.iterations = 2;
     p.initialLength = 2000.0f;
-    p.initialRadius = 60.0f;
-    p.lengthDecay = 0.40f;
+    p.initialRadius = 40.0f;
+    p.lengthDecay = 0.35f;
 
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
@@ -176,7 +171,7 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeC()
     std::vector<std::shared_ptr<Tree>> trees;
     std::shared_ptr<Tree> tree;
     TreeGenParams p;
-    int seed = 1338;
+    int seed = vSeed;
 
     // LOD 0
     p.axiom = "X";
@@ -201,21 +196,29 @@ std::vector<std::shared_ptr<Tree>> VegetationManager::CreateTreesTypeC()
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
-
 
     // LOD 1
-    p.rules['X'] = "FF[&+XFX][-XFX]X";
-    p.iterations = 2;
+    p.rules['X'] = "F[&+XX][-XX]X";
+    p.iterations = 3;
     p.initialLength = 250.0f;
 
     tree = std::make_shared<Tree>();
     tree->CreateVAO(p, seed);
     trees.push_back(tree);
-    trees.push_back(tree);
 
 
     // LOD 2
+    p.rules['X'] = "FF[&+XF][-XF]X";
+    p.iterations = 2;
+    p.initialLength = 250.0f;
+    p.yawDeg = 25.0f;
+
+    tree = std::make_shared<Tree>();
+    tree->CreateVAO(p, seed);
+    trees.push_back(tree);
+
+
+    // LOD 3
     tree = std::make_shared<Tree>();
     tree->CreateVAO();
     trees.push_back(tree);

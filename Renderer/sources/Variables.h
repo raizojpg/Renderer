@@ -1,6 +1,7 @@
 #pragma once
 
 extern int vSpeed;
+extern int vSeed;
 
 extern int vSkyboxScale;
 extern int vFogStart;
@@ -14,6 +15,7 @@ extern int vPatchSize;
 extern int vMaxLod;
 extern int vLodDistribution;
 
+extern int vTreeLodDistribution;
 extern int vTreeInstanceCount;
 extern float vLowerTreeTreshold;
 extern float vUpperTreeTreshold;
@@ -24,3 +26,5 @@ extern float vFrequency;
 extern float vAmplitude;
 extern float vLacunarity;
 extern float vGain;
+
+

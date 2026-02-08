@@ -288,7 +288,7 @@ void Terrain::DrawVegetation(Shader* MyShader){
 
 			glm::mat4 model = terrainMat * glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
 			MyShader->setUniformMat4("modelMatrix", model);
-            
+
 			MyShader->setUniformFloat("uLowerTreeTreshold", vUpperTreeTreshold);
 			MyShader->setUniformFloat("uUpperTreeTreshold", 1.0);
 			int lodA = std::min(int(vegetation.treesTypeA.size()) - 1, lod);
@@ -369,8 +369,8 @@ void Terrain::updateLodMap(glm::vec3 observer){
 			float distance = glm::sqrt((midi - x) * (midi - x) + (midj - y) * (midj - y));
 			int lod = int(distance) / step / patchSize / vLodDistribution;
 			lodMap[int(i / patchSize)][int(j / patchSize)] = std::min(lod, maxLod - 1);
-			vegetation.lodMap[int(i / patchSize)][int(j / patchSize)] = lod;
-			//std::cout << lod << " ";
+			vegetation.lodMap[int(i / patchSize)][int(j / patchSize)] = lod / vTreeLodDistribution;
+			//std::cout << lod / vVegetationLodDistribution << " ";
 		}
 		//std::cout << std::endl;
 	}

@@ -1,26 +1,29 @@
 #include "Variables.h"
 
 int vSpeed = 100;
+int vSeed = 1338;
 
-int vSkyboxScale = 100;
-int vFogStart = 30000;
-int vFogEnd = 50000;
+int vSkyboxScale = 200;
+int vFogStart = 50000;
+int vFogEnd = 100000;
 
 int vTerrainSize = 2048;
-int vTerrainStep = 50;
+int vTerrainStep = 100;
 int vMaxHeight = 2550;
 
-int vPatchSize = 64;
-int vMaxLod = 6;
-int vLodDistribution = 2;
+int vPatchSize = 128;
+int vMaxLod = 10;
+int vLodDistribution = 1;
 
-int vTreeInstanceCount = 3;
+int vTreeLodDistribution = 2;
+int vTreeInstanceCount = 20;
 float vLowerTreeTreshold = 0.35;
 float vUpperTreeTreshold = 0.5;
 
-float vNoiseScale = 0.00015f;
-int vOctaves = 5;
-float vFrequency = 1.0;
-float vAmplitude = 2.0;
+float vNoiseScale = 0.00010f;
+int vOctaves = 8;
+float vFrequency = 0.5;
+float vAmplitude = 2.5;
 float vLacunarity = 2.0;
 float vGain = 0.5;
+

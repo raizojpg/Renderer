@@ -110,16 +110,18 @@ void ShowMyImGuiWindow()
 	static int terrainSizeIdx = 4;
 
 	const char* patchSizes[] = { "4", "8", "16", "32", "64", "128", "256" };
-	static int patchSizeIdx = 4;
+	static int patchSizeIdx = 5;
 
 	ImGui::Begin("Options");
 
 	// General
 	ImGui::SliderInt("Speed", &vSpeed, 1, 2000);
+	needsInitialization |= ImGui::SliderInt("Seed", &vSeed, 1, 5000);
+	freezeSimulation |= ImGui::IsItemActive();
 
 	// Skybox & Fog
 	ImGui::Text("Skybox & Fog");
-	ImGui::SliderInt("Skybox Scale", &vSkyboxScale, 1, 200);
+	ImGui::SliderInt("Skybox Scale", &vSkyboxScale, 1, 400);
 	ImGui::SliderInt("Fog Start", &vFogStart, 0, 100000);
 	ImGui::SliderInt("Fog End", &vFogEnd, 0, 200000);
 
@@ -148,14 +150,14 @@ void ShowMyImGuiWindow()
 	needsInitialization |= ImGui::SliderInt("Max LOD", &vMaxLod, 1, 10);
 	freezeSimulation |= ImGui::IsItemActive();
 
-	ImGui::SliderInt("LOD Distribution", &vLodDistribution, 1, 10);
-	if (vLodDistribution < 1) vLodDistribution = 1;
+	ImGui::SliderInt("LOD Distribution", &vLodDistribution, 1, 5);
 
 	ImGui::Separator();
 
 	// Vegetation
 	ImGui::Text("Vegetation");
-	ImGui::SliderInt("Tree Instance Count", &vTreeInstanceCount, 0, 128);
+	ImGui::SliderInt("Tree LOD Distribution", &vTreeLodDistribution, 1, 5);
+	ImGui::SliderInt("Tree Instance Count", &vTreeInstanceCount, 0, 64);
 	ImGui::SliderFloat("Lower Tree Threshold", &vLowerTreeTreshold, 0.0f, 1.0f);
 	ImGui::SliderFloat("Upper Tree Threshold", &vUpperTreeTreshold, 0.0f, 1.0f);
 
@@ -263,7 +265,7 @@ void RenderFunction(void)
 
 	MyShader.setUniformInt("usingNoise", 0);
 
-	glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(vSkyboxScale, vSkyboxScale, 100));
+	glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(vSkyboxScale, vSkyboxScale, vSkyboxScale));
 	MyShader.setUniformMat4("modelMatrix", skyboxMat);
 	MyShader.setUniformInt("codCol", 2);
 	MyShader.updateMaterial(models->MySkybox->getMaterial());

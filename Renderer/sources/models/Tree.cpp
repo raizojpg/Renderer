@@ -41,18 +41,30 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
     // ------------------------------------------------------------
     // Create instance model matrices
     // ------------------------------------------------------------
+
+    std::mt19937 rng(seed);
+    float tx, ty, tz, rx, ry, rz;
+    std::uniform_real_distribution<float> transDist(-(vPatchSize + 1) * vTerrainStep, (vPatchSize + 1) * vTerrainStep);
+    std::uniform_real_distribution<float> zDist(-150.0f, -50.0f);
+    std::uniform_real_distribution<float> rotDist(-glm::pi<float>() / 16, glm::pi<float>() / 16);
+
     glm::mat4 MatModel[INSTANCE_COUNT];
     for (int instID = 0; instID < INSTANCE_COUNT; instID++)
     {
+        tx = transDist(rng);
+        ty = transDist(rng);
+        tz = zDist(rng);
+
+        rx = rotDist(rng);
+        ry = rotDist(rng);
+        rz = rotDist(rng);
+
         MatModel[instID] =
             glm::rotate(glm::mat4(1.0f), glm::pi<float>(), glm::vec3(1, 0, 0))
-            * glm::translate(glm::mat4(1.0f), glm::vec3(
-                180 * instID*3 * cos(instID % 10 * 1.7f),
-                180 * instID*3 * sin(instID % 10 * 2.3f),
-                -100))
-            * glm::rotate(glm::mat4(1.0f), ((instID % 10 + 1) * PI / 100), glm::vec3(1, 0, 0))
-            * glm::rotate(glm::mat4(1.0f), (instID % 10 * PI / 60), glm::vec3(0, 1, 0))
-            * glm::rotate(glm::mat4(1.0f), (3 * instID % 10 * PI / 20), glm::vec3(0, 0, 1));
+            * glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz))
+            * glm::rotate(glm::mat4(1.0f), rx, glm::vec3(1, 0, 0))
+            * glm::rotate(glm::mat4(1.0f), ry, glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(1.0f), rz, glm::vec3(0, 0, 1));
     }
 
     // ------------------------------------------------------------
