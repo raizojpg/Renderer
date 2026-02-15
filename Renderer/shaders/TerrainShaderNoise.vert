@@ -11,6 +11,7 @@ uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 
 uniform int usingNoise;
+uniform int usingBiomes;
 uniform float uMaxHeight;
 uniform float uNoiseScale;
 uniform int uOctaves;
@@ -18,6 +19,11 @@ uniform float uFrequency;
 uniform float uAmplitude;
 uniform float uLacunarity;
 uniform float uGain;
+uniform int uBiomeOctaves;
+uniform float uBiomeFrequency;
+uniform float uBiomeAmplitude;
+uniform float uBiomeLacunarity;
+uniform float uBiomeGain;
 
 out vec3 ex_Color;
 out vec3 frag_Position;
@@ -100,15 +106,41 @@ void main(void)
             uGain   
         );
 
+        float bnoise = perlinFBM(
+            uv,
+            uBiomeOctaves,   
+            uBiomeFrequency,    
+            uBiomeAmplitude,   
+            uBiomeLacunarity,   
+            uBiomeGain   
+        );
+
+        bnoise = bnoise * 0.75 + 0.0;
         noise = noise * 0.5 + 0.5;
-   
+      
+        if(usingBiomes == 1){
+			noise = mix(noise, bnoise, bnoise);
+		}
+        
         vec4 displacedPosition = in_Position;
         displacedPosition.z = -noise * uMaxHeight;
         //displacedPosition.z = 0;
 
         position = projectionMatrix * viewMatrix * modelMatrix * displacedPosition;
         
-        ex_Color = vec3(noise);
+        if (noise < 4){
+            ex_Color = vec3(noise);
+        }
+        else{
+            if(noise < 5){
+                float n = clamp((noise-4) / 1.0, 0.2, 1.0);
+                ex_Color = vec3(1-n + 0.2);
+            }
+            else{
+                float n = clamp((noise-5) / 4.0, 0.2, 1.0);
+                ex_Color = vec3(n);
+            }
+        }
     }
     else{
         position = projectionMatrix * viewMatrix * modelMatrix * in_Position;

@@ -27,4 +27,9 @@ extern float vAmplitude;
 extern float vLacunarity;
 extern float vGain;
 
-
+extern bool vUseBiomes;
+extern int vBiomeOctaves;
+extern float vBiomeFrequency;
+extern float vBiomeAmplitude;
+extern float vBiomeLacunarity;
+extern float vBiomeGain;

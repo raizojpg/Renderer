@@ -26,7 +26,7 @@ std::string LSystemTreeGenerator::expandGrammar(const TreeGenParams& params){
     return current;
 }
 
-void LSystemTreeGenerator::skipUntilMatchingBracket(const std::string& commands, size_t& i){
+void LSystemTreeGenerator::skipUntilMatchingBracket(const std::string& commands, int& i){
     // commands[i] should currently be '[' when called.
     // We want to skip until we reach the matching ']'.
     int bracketBalance = 0;
@@ -93,8 +93,7 @@ TreeSkeleton LSystemTreeGenerator::interpretTurtle(const std::string& commands, 
             t.rot = glm::normalize(q * t.rot);
         };
 
-
-    for (size_t i = 0; i < commands.size(); ++i){
+    for (int i = 0; i < commands.size(); ++i){
         const char c = commands[i];
         switch (c){
         case 'F':
@@ -177,5 +176,73 @@ TreeSkeleton LSystemTreeGenerator::interpretTurtle(const std::string& commands, 
         }
     }
 
-    return skeleton;
+    return mergeColinearConsecutiveSegments(skeleton);
+}
+
+inline bool LSystemTreeGenerator::nearlyEqualVec3(const glm::vec3& a, const glm::vec3& b, float eps)
+{
+    return glm::length(a - b) <= eps;
+}
+
+inline bool LSystemTreeGenerator::colinearDirections(const glm::vec3& d0, const glm::vec3& d1, float dotThreshold)
+{
+    return std::abs(glm::dot(d0, d1)) >= dotThreshold;
+}
+
+TreeSkeleton LSystemTreeGenerator::mergeColinearConsecutiveSegments(const TreeSkeleton& inputSkeleton, float positionEpsilon, float angleEpsilonDeg)
+{
+    TreeSkeleton mergedSkeleton;
+    const float colinearDotThreshold = std::cos(glm::radians(angleEpsilonDeg));
+    std::vector<int> mergedIndex(inputSkeleton.segments.size(), -1);
+
+    for (int i = 0; i < inputSkeleton.segments.size(); ++i){
+        const Segment& inputSeg = inputSkeleton.segments[i];
+        int remappedParentIndex = (inputSeg.parent >= 0) ? mergedIndex[inputSeg.parent] : -1;
+
+        Segment candidateSeg = inputSeg;
+        candidateSeg.parent = remappedParentIndex;
+
+        bool merged = false;
+        if (!mergedSkeleton.segments.empty())
+        {
+            int lastMergedIndex = mergedSkeleton.segments.size() - 1;
+            Segment& lastMergedSeg = mergedSkeleton.segments.back();
+
+            // Same branch ?
+            if (candidateSeg.parent == lastMergedIndex)
+            {
+                // Connected ?
+                if (nearlyEqualVec3(lastMergedSeg.p1, candidateSeg.p0, positionEpsilon))
+                {
+                    glm::vec3 prevVec = lastMergedSeg.p1 - lastMergedSeg.p0;
+                    glm::vec3 currVec = candidateSeg.p1 - candidateSeg.p0;
+                    float prevLen = glm::length(prevVec);
+                    float currLen = glm::length(currVec);
+
+                    if (prevLen > 1e-8f && currLen > 1e-8f)
+                    {
+                        glm::vec3 prevDir = prevVec / prevLen;
+                        glm::vec3 currDir = currVec / currLen;
+
+                        // Colinear ?
+                        if (colinearDirections(prevDir, currDir, colinearDotThreshold))
+                        {
+                            lastMergedSeg.p1 = candidateSeg.p1;
+                            lastMergedSeg.r1 = candidateSeg.r1;
+                            merged = true;
+                            mergedIndex[i] = lastMergedIndex;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!merged)
+        {
+            mergedSkeleton.segments.push_back(candidateSeg);
+            mergedIndex[i] = mergedSkeleton.segments.size() - 1;
+        }
+    }
+
+    return mergedSkeleton;
 }

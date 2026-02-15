@@ -24,6 +24,7 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	MyShader.updateMaterial(MyTerrain.getMaterial());
 
 	MyShader.setUniformInt("usingNoise", 1);
+	MyShader.setUniformInt("usingBiomes", vUseBiomes);
 	MyShader.setUniformFloat("uMaxHeight", MyTerrain.getMaxHeight());
 	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
 	MyShader.setUniformInt("uOctaves", vOctaves);
@@ -31,6 +32,11 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	MyShader.setUniformFloat("uAmplitude", vAmplitude);
 	MyShader.setUniformFloat("uLacunarity", vLacunarity);
 	MyShader.setUniformFloat("uGain", vGain);
+	MyShader.setUniformInt("uBiomeOctaves", vBiomeOctaves);
+	MyShader.setUniformFloat("uBiomeFrequency", vBiomeFrequency);
+	MyShader.setUniformFloat("uBiomeAmplitude", vBiomeAmplitude);
+	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
+	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
 
 	MyShader.setUniformFloat("uFogStart", vFogStart);
 	MyShader.setUniformFloat("uFogEnd", vFogEnd);
@@ -55,14 +61,19 @@ void ShaderManager::UpdateVegetation(Terrain& MyTerrain, Camera& MyCamera, Light
 	MyShader.updateMaterial(MyTerrain.getMaterial());
 
 	MyShader.setUniformInt("usingNoise", 1);
+	MyShader.setUniformInt("usingBiomes", vUseBiomes);
 	MyShader.setUniformFloat("uMaxHeight", MyTerrain.getMaxHeight());
-	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
 	MyShader.setUniformFloat("uNoiseScale", vNoiseScale);
 	MyShader.setUniformInt("uOctaves", vOctaves);
 	MyShader.setUniformFloat("uFrequency", vFrequency);
 	MyShader.setUniformFloat("uAmplitude", vAmplitude);
 	MyShader.setUniformFloat("uLacunarity", vLacunarity);
 	MyShader.setUniformFloat("uGain", vGain);
+	MyShader.setUniformInt("uBiomeOctaves", vBiomeOctaves);
+	MyShader.setUniformFloat("uBiomeFrequency", vBiomeFrequency);
+	MyShader.setUniformFloat("uBiomeAmplitude", vBiomeAmplitude);
+	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
+	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
 
 	MyShader.setUniformFloat("uFogStart", vFogStart);
 	MyShader.setUniformFloat("uFogEnd", vFogEnd);

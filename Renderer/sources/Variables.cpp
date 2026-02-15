@@ -1,6 +1,6 @@
 #include "Variables.h"
 
-int vSpeed = 100;
+int vSpeed = 200;
 int vSeed = 1338;
 
 int vSkyboxScale = 200;
@@ -27,3 +27,9 @@ float vAmplitude = 2.5;
 float vLacunarity = 2.0;
 float vGain = 0.5;
 
+bool vUseBiomes = 1;
+int vBiomeOctaves = 4;
+float vBiomeFrequency = 0.05;
+float vBiomeAmplitude = 10;
+float vBiomeLacunarity = 4.0;
+float vBiomeGain = 0.25;

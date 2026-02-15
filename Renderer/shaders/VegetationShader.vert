@@ -12,6 +12,7 @@ uniform mat4 projectionMatrix;
 uniform vec3 viewPos;
 
 uniform int usingNoise;
+uniform int usingBiomes;
 uniform float uMaxHeight;
 uniform float uNoiseScale;
 uniform int uOctaves;
@@ -19,6 +20,11 @@ uniform float uFrequency;
 uniform float uAmplitude;
 uniform float uLacunarity;
 uniform float uGain;
+uniform int uBiomeOctaves;
+uniform float uBiomeFrequency;
+uniform float uBiomeAmplitude;
+uniform float uBiomeLacunarity;
+uniform float uBiomeGain;
 uniform float uLowerTreeTreshold;
 uniform float uUpperTreeTreshold;
 
@@ -104,7 +110,21 @@ void main(void)
             uGain   
         );
 
+        float bnoise = perlinFBM(
+            uv,
+            uBiomeOctaves,   
+            uBiomeFrequency,    
+            uBiomeAmplitude,   
+            uBiomeLacunarity,   
+            uBiomeGain   
+        );
+
+        bnoise = bnoise * 0.75 + 0.0;
         noise = noise * 0.5 + 0.5;
+        
+        if(usingBiomes == 1){
+			noise = mix(noise, bnoise, bnoise);
+		}
 
         // Threshold check
         if (noise < uLowerTreeTreshold || noise > uUpperTreeTreshold) {

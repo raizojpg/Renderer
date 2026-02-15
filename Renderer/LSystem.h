@@ -69,7 +69,10 @@ public:
 private:
     std::string expandGrammar(const TreeGenParams& params);
     TreeSkeleton interpretTurtle(const std::string& commands, const TreeGenParams& params, uint32_t seed);
-
+    TreeSkeleton mergeColinearConsecutiveSegments(const TreeSkeleton& inputSkeleton, float positionEpsilon = 1e-4f, float angleEpsilonDeg = 1.0f);
+    inline bool nearlyEqualVec3(const glm::vec3& a, const glm::vec3& b, float eps);
+    inline bool colinearDirections(const glm::vec3& d0, const glm::vec3& d1, float dotThreshold);
+    
 private:
 
     struct Rng
@@ -104,6 +107,6 @@ private:
 
     // Utility: skip characters until the matching closing bracket ']' is found.
     // This is used for stochastic pruning when we decide to ignore a whole branch.
-    static void skipUntilMatchingBracket(const std::string& commands, size_t& i);
+    static void skipUntilMatchingBracket(const std::string& commands, int& i);
 };
 

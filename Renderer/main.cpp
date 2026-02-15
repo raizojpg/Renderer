@@ -172,6 +172,15 @@ void ShowMyImGuiWindow()
 	ImGui::SliderFloat("Lacunarity", &vLacunarity, 0.01f, 10.0f);
 	ImGui::SliderFloat("Gain", &vGain, 0.0f, 1.0f);
 
+	// Biomes
+	ImGui::Text("Biomes");
+	ImGui::Checkbox("Use Biomes", &vUseBiomes);
+	ImGui::SliderInt("Biome Octaves", &vBiomeOctaves, 1, 10);
+	ImGui::SliderFloat("Biome Frequency", &vBiomeFrequency, 0.001f, 1.0f);
+	ImGui::SliderFloat("Biome Amplitude", &vBiomeAmplitude, 1.0f, 20.0f);
+	ImGui::SliderFloat("Biome Lacunarity", &vBiomeLacunarity, 0.01f, 10.0f);
+	ImGui::SliderFloat("Biome Gain", &vBiomeGain, 0.0f, 1.0f);
+
 	// Reinitialization trigger
 	if (needsInitialization && !freezeSimulation)
 	{
