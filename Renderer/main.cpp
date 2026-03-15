@@ -21,6 +21,7 @@ ModelManager* models = nullptr;
 ShaderManager* shaders = nullptr;
 LightManager lights;
 
+Camera OverviewCamera;
 Camera MyCamera;
 InputManager inputs(MyCamera);
 
@@ -115,9 +116,13 @@ void ShowMyImGuiWindow()
 	ImGui::Begin("Options");
 
 	// General
+	ImGui::Text("Misc");
+	ImGui::Checkbox("Enable Frustum Culling", &vEnableFrustumCulling);
 	ImGui::SliderInt("Speed", &vSpeed, 1, 2000);
 	needsInitialization |= ImGui::SliderInt("Seed", &vSeed, 1, 5000);
 	freezeSimulation |= ImGui::IsItemActive();
+
+	ImGui::Separator();
 
 	// Skybox & Fog
 	ImGui::Text("Skybox & Fog");
@@ -171,6 +176,8 @@ void ShowMyImGuiWindow()
 	ImGui::SliderFloat("Amplitude", &vAmplitude, 0.01f, 10.0f);
 	ImGui::SliderFloat("Lacunarity", &vLacunarity, 0.01f, 10.0f);
 	ImGui::SliderFloat("Gain", &vGain, 0.0f, 1.0f);
+
+	ImGui::Separator();
 
 	// Biomes
 	ImGui::Text("Biomes");
@@ -268,7 +275,7 @@ void RenderFunction(void)
 	Shader& MyShader = shaders->MyTerrainShaderNoise;
 	MyShader.Bind();
 
-	models->MyTerrain->updateLodMap(MyCamera.getObs());
+	models->MyTerrain->updateMap(MyCamera);
 	shaders->UpdateTerrainNoise(*models->MyTerrain, MyCamera, lights.myLight);
 	models->MyTerrain->Draw();
 
@@ -283,15 +290,9 @@ void RenderFunction(void)
 	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 	models->Update(MyShader);
 
-
 	shaders->MyVegetationShader.Bind();
 	shaders->UpdateVegetation(*models->MyTerrain, MyCamera, lights.myLight);
 	models->MyTerrain->DrawVegetation(&shaders->MyVegetationShader);
-
-	///*MyShader.setUniformMat4("modelMatrix", matStack.top());
-	//for (Model* model : models) {
-	//	model->Draw();
-	//}*/
 
 	shaders->MyInstancingShader.Bind();
 	shaders->MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
@@ -300,8 +301,24 @@ void RenderFunction(void)
 	shaders->MyInstancingShader.setUniformInt("codCol", 0);
 	models->MyCube->Draw();
 
-	//shaders->MyInstancingShader.setUniformInt("codCol", 1);
-	//MyCube.DrawEdges();
+	if (vEnableOverview) {
+		glDisable(GL_DEPTH_TEST);
+		glViewport(winWidth - winWidth / 4 - 10, winHeight - winHeight / 4 - 10, winWidth / 4, winHeight / 4);
+
+		OverviewCamera.setObs(glm::vec3(MyCamera.getObs().x, MyCamera.getObs().y, -100000.0f));
+		OverviewCamera.setRef(MyCamera.getObs());
+		OverviewCamera.setVert(glm::vec3(1.0f, 0.0f, 0.0f));
+		OverviewCamera.setView();
+		OverviewCamera.setProjection(MyCamera.getProjection());
+		
+		shaders->MyTerrainShaderNoise.Bind();
+		shaders->UpdateTerrainNoise(*models->MyTerrain, OverviewCamera, lights.myLight);
+		shaders->MyTerrainShaderNoise.setUniformInt("uUseFog", 0);
+		models->MyTerrain->Draw();
+		
+		glViewport(0, 0, winWidth, winHeight);
+		glEnable(GL_DEPTH_TEST);
+	}
 
 	ShowMyImGuiWindow();
 	ImGui::Render();

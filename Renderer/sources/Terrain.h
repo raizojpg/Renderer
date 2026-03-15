@@ -18,7 +18,9 @@ public:
 	glm::mat4 getTerrainMat();
 
 	void loadHightmap();
+	void updateMap(Camera& MyCamera);
 	void updateLodMap(glm::vec3 obs);
+	void updateCullMap(Camera& MyCamera);
 		
 	~Terrain();
 
@@ -44,6 +46,7 @@ private:
 
 	std::vector<LodInfo> lods;
 	std::vector<std::vector<short>> lodMap;
+	std::vector<std::vector<bool>> cullMap;
 
 	VegetationManager vegetation;
 };

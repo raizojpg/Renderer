@@ -2,8 +2,11 @@
 
 int vSpeed = 200;
 int vSeed = 1338;
+bool vEnableFrustumCulling = 1;
+bool vEnableOverview = 0;
 
 int vSkyboxScale = 200;
+bool vUseFog = 1;
 int vFogStart = 50000;
 int vFogEnd = 100000;
 

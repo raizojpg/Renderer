@@ -44,7 +44,7 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
 
     std::mt19937 rng(seed);
     float tx, ty, tz, rx, ry, rz;
-    std::uniform_real_distribution<float> transDist(-(vPatchSize + 1) * vTerrainStep, (vPatchSize + 1) * vTerrainStep);
+    std::uniform_real_distribution<float> transDist(-0.5f * vPatchSize * vTerrainStep, 0.5f * vPatchSize * vTerrainStep);
     std::uniform_real_distribution<float> zDist(-150.0f, -50.0f);
     std::uniform_real_distribution<float> rotDist(-glm::pi<float>() / 16, glm::pi<float>() / 16);
 

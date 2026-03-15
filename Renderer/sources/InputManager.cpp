@@ -35,6 +35,9 @@ void InputManager::ProcessNormalKeys(unsigned char key, int x, int y) {
 	case 'e':
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		break;
+	case 'o':
+		vEnableOverview = !vEnableOverview;
+		break;
 	}
 	if (key == 27)
 		exit(0);

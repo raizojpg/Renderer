@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 
+#include "Camera.h"
 #include "Shader.h"
 #include "MaterialManager.h"
 

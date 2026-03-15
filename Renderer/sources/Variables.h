@@ -2,8 +2,11 @@
 
 extern int vSpeed;
 extern int vSeed;
+extern bool vEnableFrustumCulling;
+extern bool vEnableOverview;
 
 extern int vSkyboxScale;
+extern bool vUseFog;
 extern int vFogStart;
 extern int vFogEnd;
 

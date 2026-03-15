@@ -13,6 +13,7 @@ Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l },
 
 	int patchesX = (WIDTH - 1) / patchSize;
 	int patchesY = (LENGTH - 1) / patchSize;
+	cullMap = std::vector<std::vector<bool>>(patchesX, std::vector<bool>(patchesY, 0));
 	lodMap = std::vector<std::vector<short>>(patchesX, std::vector<short>(patchesY, 0));
 	vegetation.lodMap = lodMap;
 }
@@ -253,6 +254,8 @@ void Terrain::Draw(Shader* MyShader){
 			int jj = j / patchSize;
 			int lod = lodMap[ii][jj];
 
+			if (cullMap[ii][jj] && vEnableFrustumCulling) {continue;}
+
 			int nlod = (ii - 1 >= 0) ? lodMap[ii - 1][jj] : lod;
 			nlod = (nlod > lod) ? nlod - lod : 0;
 			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[nlod][0].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[nlod][0].start * sizeof(GLuint)), baseVertex);
@@ -285,6 +288,8 @@ void Terrain::DrawVegetation(Shader* MyShader){
 			int ii = i / patchSize;
 			int jj = j / patchSize;
 			int lod = vegetation.lodMap[ii][jj];
+
+			if (cullMap[ii][jj] && vEnableFrustumCulling) { continue; }
 
 			glm::mat4 model = terrainMat * glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
 			MyShader->setUniformMat4("modelMatrix", model);
@@ -338,43 +343,62 @@ void Terrain::loadHightmap(){
 
 }
 
-void Terrain::updateLodMap(glm::vec3 observer){
-	glm::vec4 obs = glm::vec4(observer, 0) - terrainMat[3];
-	float x = obs.x;
-	float y = obs.y;
-	float z = obs.z;
+void Terrain::updateMap(Camera& MyCamera)
+{
+	// Observer in terrain-local space
+	glm::vec3 obs = MyCamera.getObs() - glm::vec3(terrainMat[3]);
+	int patchX = int(std::floor(obs.x / (patchSize * step)));
+	int patchY = int(std::floor(obs.y / (patchSize * step)));
 
-	int patchX = int(std::floor(x / (patchSize * step)));
-	int patchY = int(std::floor(y / (patchSize * step)));
-
+	// Recenter terrain around observer
 	if (patchX < (WIDTH - 1) / patchSize / 2) {
-		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(-patchSize * step, 0, 0));
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(-patchSize * step, 0.0f, 0.0f));
 	}
 	else if (patchX > (WIDTH - 1) / patchSize / 2) {
-		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(patchSize * step, 0, 0));
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(patchSize * step, 0.0f, 0.0f));
 	}
+
 	if (patchY < (LENGTH - 1) / patchSize / 2) {
-		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, -patchSize * step, 0));
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -patchSize * step, 0.0f));
 	}
 	else if (patchY > (LENGTH - 1) / patchSize / 2) {
-		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0, patchSize * step, 0));
+		terrainMat *= glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, patchSize * step, 0.0f));
 	}
 
-	//std::cout << patchX << "  " << patchY << std::endl;
-	
+	// Recompute observer local position after recentering, if needed
+	glm::vec3 translation = glm::vec3(terrainMat[3]);
+	obs = MyCamera.getObs() - translation;
+
 	for (int i = 0; i < WIDTH - 1; i += patchSize) {
 		for (int j = 0; j < LENGTH - 1; j += patchSize) {
-			float midi = (i + patchSize / 2) * step;
-			float midj = (j + patchSize / 2) * step;
-			float distance = glm::sqrt((midi - x) * (midi - x) + (midj - y) * (midj - y));
-			int lod = int(distance) / step / patchSize / vLodDistribution;
-			lodMap[int(i / patchSize)][int(j / patchSize)] = std::min(lod, maxLod - 1);
-			vegetation.lodMap[int(i / patchSize)][int(j / patchSize)] = lod / vTreeLodDistribution;
-			//std::cout << lod / vVegetationLodDistribution << " ";
-		}
-		//std::cout << std::endl;
-	}
+			int pi = i / patchSize;
+			int pj = j / patchSize;
 
+			// ---- LOD ----
+			float midi = (i + patchSize / 2.0f) * step;
+			float midj = (j + patchSize / 2.0f) * step;
+			float distance = glm::sqrt((midi - obs.x) * (midi - obs.x) + (midj - obs.y) * (midj - obs.y));
+
+			int lod = int(distance) / step / patchSize / vLodDistribution;
+			lodMap[pi][pj] = std::min(lod, maxLod - 1);
+			vegetation.lodMap[pi][pj] = lod / vTreeLodDistribution;
+
+			// ---- Culling ----
+			if (vEnableFrustumCulling) {
+				glm::vec3 p1(i * step, j * step, -maxHeight * step);
+				glm::vec3 p2((i + patchSize) * step, (j + patchSize) * step, 0.0f);
+
+				glm::vec3 pMin(std::min(p1.x, p2.x), std::min(p1.y, p2.y), std::min(p1.z, p2.z));
+				glm::vec3 pMax(std::max(p1.x, p2.x), std::max(p1.y, p2.y), std::max(p1.z, p2.z));
+
+				pMin += translation;
+				pMax += translation;
+
+				bool visible = MyCamera.isBoxInFrustum(pMin, pMax);
+				cullMap[pi][pj] = !visible;
+			}
+		}
+	}
 }
 
 Terrain::~Terrain(){

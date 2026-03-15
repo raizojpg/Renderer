@@ -38,6 +38,7 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
 	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
 
+	MyShader.setUniformInt("uUseFog", vUseFog);
 	MyShader.setUniformFloat("uFogStart", vFogStart);
 	MyShader.setUniformFloat("uFogEnd", vFogEnd);
 

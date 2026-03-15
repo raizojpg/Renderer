@@ -29,6 +29,7 @@ uniform Light lightShader;
 out vec3 out_Color;
 
 vec3 result;
+uniform int uUseFog;
 uniform float uFogStart;
 uniform float uFogEnd;
 vec3 fogColor = vec3(0.7, 0.7, 0.7);
@@ -84,6 +85,11 @@ void main(void)
     float distance = length(in_ViewPos - frag_Position);
     float fogFactor = clamp((uFogEnd - distance) / (uFogEnd - uFogStart), 0.0, 1.0);
 
-    out_Color = mix(fogColor, result, fogFactor);
-
+    if (uUseFog == 0){
+         out_Color = mix(fogColor, result, 1);
+    }
+    else{
+         out_Color = mix(fogColor, result, fogFactor);
+    }
+  
 }
