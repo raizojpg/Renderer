@@ -1,4 +1,5 @@
 #include "Skybox.h"
+#include "../Profiler.h"
 
 Skybox::Skybox() {}
 
@@ -67,7 +68,7 @@ void Skybox::CreateVAO() {
 
 void Skybox::Draw(Shader* MyShader) {
 	this->Bind();
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	ProfilerGL::DrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
 Skybox::~Skybox() {

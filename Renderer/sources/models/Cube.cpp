@@ -1,4 +1,5 @@
 #include "Cube.h"
+#include "../Profiler.h"
 #define INSTANCE_COUNT 50
 
 Cube::Cube(){}
@@ -89,15 +90,15 @@ void Cube::CreateVAO(){
 
 void Cube::Draw(Shader* MyShader){
 	this->Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, INSTANCE_COUNT);
+	ProfilerGL::DrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, INSTANCE_COUNT);
 }
 
 void Cube::DrawEdges(){
 	this->Bind();
 	glLineWidth(2.5);
-	glDrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(36 * sizeof(GLuint)), INSTANCE_COUNT);
-	glDrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(40 * sizeof(GLuint)), INSTANCE_COUNT);
-	glDrawElementsInstanced(GL_LINES, 8, GL_UNSIGNED_INT, (void*)(44 * sizeof(GLuint)), INSTANCE_COUNT);
+	ProfilerGL::DrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(36 * sizeof(GLuint)), INSTANCE_COUNT);
+	ProfilerGL::DrawElementsInstanced(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)(40 * sizeof(GLuint)), INSTANCE_COUNT);
+	ProfilerGL::DrawElementsInstanced(GL_LINES, 8, GL_UNSIGNED_INT, (void*)(44 * sizeof(GLuint)), INSTANCE_COUNT);
 }
 
 Cube::~Cube(){

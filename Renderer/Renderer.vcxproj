@@ -195,6 +195,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClCompile Include="sources\MaterialManager.cpp" />
     <ClCompile Include="sources\Model.cpp" />
     <ClCompile Include="sources\ModelManager.cpp" />
+    <ClCompile Include="sources\Profiler.cpp" />
     <ClCompile Include="sources\models\Cube.cpp" />
     <ClCompile Include="sources\models\Skybox.cpp" />
     <ClCompile Include="sources\models\Sphere.cpp" />
@@ -525,6 +526,7 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <ClInclude Include="sources\MaterialManager.h" />
     <ClInclude Include="sources\Model.h" />
     <ClInclude Include="sources\ModelManager.h" />
+    <ClInclude Include="sources\Profiler.h" />
     <ClInclude Include="sources\models\Cube.h" />
     <ClInclude Include="sources\models\Skybox.h" />
     <ClInclude Include="sources\models\Sphere.h" />

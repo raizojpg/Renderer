@@ -1,4 +1,5 @@
 #include "Terrain.h"
+#include "Profiler.h"
 #include <cstdlib>
 #include <ctime>
 #include "SOIL.h"
@@ -258,21 +259,21 @@ void Terrain::Draw(Shader* MyShader){
 
 			int nlod = (ii - 1 >= 0) ? lodMap[ii - 1][jj] : lod;
 			nlod = (nlod > lod) ? nlod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[nlod][0].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[nlod][0].start * sizeof(GLuint)), baseVertex);
+			ProfilerGL::DrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[nlod][0].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[nlod][0].start * sizeof(GLuint)), baseVertex);
 			
 			int elod = (jj + 1 < LENGTH / patchSize) ? lodMap[ii][jj + 1] : lod;
 			elod = (elod > lod) ? elod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[elod][1].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[elod][1].start * sizeof(GLuint)), baseVertex);
+			ProfilerGL::DrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[elod][1].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[elod][1].start * sizeof(GLuint)), baseVertex);
 			
 			int slod = (ii + 1 < WIDTH / patchSize) ? lodMap[ii + 1][jj] : lod;
 			slod = (slod > lod) ? slod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[slod][2].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[slod][2].start * sizeof(GLuint)), baseVertex);
+			ProfilerGL::DrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[slod][2].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[slod][2].start * sizeof(GLuint)), baseVertex);
 			
 			int wlod = (jj - 1 >= 0) ? lodMap[ii][jj - 1] : lod;
 			wlod = (wlod > lod) ? wlod - lod : 0;
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[wlod][3].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[wlod][3].start * sizeof(GLuint)), baseVertex);
+			ProfilerGL::DrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].border[wlod][3].count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].border[wlod][3].start * sizeof(GLuint)), baseVertex);
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].center.count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].center.start * sizeof(GLuint)), baseVertex);
+			ProfilerGL::DrawElementsBaseVertex(GL_TRIANGLES, 3 * lods[lod].center.count, GL_UNSIGNED_INT, (GLvoid*)(3 * lods[lod].center.start * sizeof(GLuint)), baseVertex);
 			
 		}
 	}

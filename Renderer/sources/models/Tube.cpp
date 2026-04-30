@@ -1,4 +1,5 @@
 #include "Tube.h"
+#include "../Profiler.h"
 
 Tube::Tube(int p, int m, int r): NR_PARR{ p }, NR_MERID{ m }, NR_VF{ (p + 1) * (m + 1) },
 step_u{ (U_MAX - U_MIN) / p }, step_v{ (V_MAX - V_MIN) / m }, radius(r) {}
@@ -72,7 +73,7 @@ void Tube::Draw(Shader* MyShader){
 	for (int patr = 0; patr < NR_VF; patr++)
 	{
 		if ((patr + 1) % (NR_PARR + 1) != 0)
-			glDrawElements(
+			ProfilerGL::DrawElements(
 				GL_QUADS,
 				4,
 				GL_UNSIGNED_SHORT,

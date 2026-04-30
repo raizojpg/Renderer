@@ -1,4 +1,5 @@
 #include "Tree.h"
+#include "../Profiler.h"
 
 #define INSTANCE_COUNT 64
 
@@ -139,7 +140,7 @@ void Tree::Draw(Shader* MyShader)
 {
     this->Bind();
     int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
-    glDrawElementsInstanced(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, 0, count);
+    ProfilerGL::DrawElementsInstanced(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, 0, count);
 }
 
 Tree::~Tree()

@@ -126,6 +126,9 @@
     <ClCompile Include="sources\ModelManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sources\Profiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="sources\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1095,6 +1098,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sources\ModelManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sources\Shader.h">

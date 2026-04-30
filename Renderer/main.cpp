@@ -12,6 +12,7 @@
 #include <GL/freeglut.h>
 
 #include "sources/ModelManager.h"
+#include "sources/Profiler.h"
 #include "sources/ShaderManager.h"
 #include "sources/InputManager.h"
 
@@ -26,6 +27,8 @@ Camera MyCamera;
 InputManager inputs(MyCamera);
 
 GLint winWidth = 1000, winHeight = 600;
+
+Profiler gProfiler(16384, 12);
 
 void ProcessNormalKeys(unsigned char key, int x, int y) {
 	ImGui_ImplGLUT_KeyboardFunc(key, x, y);
@@ -67,6 +70,7 @@ void ReshapeFunction(GLint newWidth, GLint newHeight)
 }
 
 void Cleanup(void){
+	gProfiler.exportCsv("profiler_metrics.csv");
 	
 	if (shaders != nullptr) {
 		delete shaders;
@@ -117,6 +121,11 @@ void ShowMyImGuiWindow()
 
 	// General
 	ImGui::Text("Misc");
+	ImGui::Checkbox("Enable Profiler", &vEnableProfiler);
+	if(gProfiler.isEnabled() != vEnableProfiler){
+		gProfiler.setEnabled(vEnableProfiler);
+	}
+
 	ImGui::Checkbox("Enable Frustum Culling", &vEnableFrustumCulling);
 	ImGui::SliderInt("Speed", &vSpeed, 1, 2000);
 	needsInitialization |= ImGui::SliderInt("Seed", &vSeed, 1, 5000);
@@ -252,6 +261,9 @@ void RenderFunction(void)
 	std::chrono::duration<float> delta = now - lastTime;
 	lastTime = now;
 
+	gProfiler.beginFrame();
+	Profiler::ScopedBinding profilerBinding(gProfiler);
+
 	accumTime += delta.count();
 	accumFrames++;
 
@@ -272,36 +284,43 @@ void RenderFunction(void)
 
 	MyCamera.Update();
 
-	Shader& MyShader = shaders->MyTerrainShaderNoise;
-	MyShader.Bind();
+	{
+		PROFILE_GPU(gProfiler, "terrain");
+		Shader& MyShader = shaders->MyTerrainShaderNoise;
+		MyShader.Bind();
 
-	models->MyTerrain->updateMap(MyCamera);
-	shaders->UpdateTerrainNoise(*models->MyTerrain, MyCamera, lights.myLight);
-	models->MyTerrain->Draw();
+		models->MyTerrain->updateMap(MyCamera);
+		shaders->UpdateTerrainNoise(*models->MyTerrain, MyCamera, lights.myLight);
+		models->MyTerrain->Draw();
 
-	MyShader.setUniformInt("usingNoise", 0);
+		MyShader.setUniformInt("usingNoise", 0);
 
-	glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(vSkyboxScale, vSkyboxScale, vSkyboxScale));
-	MyShader.setUniformMat4("modelMatrix", skyboxMat);
-	MyShader.setUniformInt("codCol", 2);
-	MyShader.updateMaterial(models->MySkybox->getMaterial());
-	models->MySkybox->Draw();
+		glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(vSkyboxScale, vSkyboxScale, vSkyboxScale));
+		MyShader.setUniformMat4("modelMatrix", skyboxMat);
+		MyShader.setUniformInt("codCol", 2);
+		MyShader.updateMaterial(models->MySkybox->getMaterial());
+		models->MySkybox->Draw();
 
-	MyShader.setUniformVec3("viewPos", MyCamera.getObs());
-	models->Update(MyShader);
+		MyShader.setUniformVec3("viewPos", MyCamera.getObs());
+		models->Update(MyShader);
+		
+		shaders->MyInstancingShader.Bind();
+		shaders->MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
+		shaders->MyInstancingShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
+		shaders->MyInstancingShader.setUniformVec3("viewPos", MyCamera.getObs());
+		shaders->MyInstancingShader.setUniformInt("codCol", 0);
+		models->MyCube->Draw();
+	}
 
-	shaders->MyVegetationShader.Bind();
-	shaders->UpdateVegetation(*models->MyTerrain, MyCamera, lights.myLight);
-	models->MyTerrain->DrawVegetation(&shaders->MyVegetationShader);
-
-	shaders->MyInstancingShader.Bind();
-	shaders->MyInstancingShader.setUniformMat4("viewMatrix", MyCamera.getView());
-	shaders->MyInstancingShader.setUniformMat4("projectionMatrix", MyCamera.getProjection());
-	shaders->MyInstancingShader.setUniformVec3("viewPos", MyCamera.getObs());
-	shaders->MyInstancingShader.setUniformInt("codCol", 0);
-	models->MyCube->Draw();
+	{
+		PROFILE_GPU(gProfiler, "vegetation");
+		shaders->MyVegetationShader.Bind();
+		shaders->UpdateVegetation(*models->MyTerrain, MyCamera, lights.myLight);
+		models->MyTerrain->DrawVegetation(&shaders->MyVegetationShader);
+	}
 
 	if (vEnableOverview) {
+		PROFILE_GPU(gProfiler, "overview");
 		glDisable(GL_DEPTH_TEST);
 		glViewport(winWidth - winWidth / 4 - 10, winHeight - winHeight / 4 - 10, winWidth / 4, winHeight / 4);
 
@@ -321,10 +340,15 @@ void RenderFunction(void)
 	}
 
 	ShowMyImGuiWindow();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	{
+		PROFILE_GPU(gProfiler, "ui");
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
 
 	RenderHud(displayFPS);
+	gProfiler.endFrame();
+
 	glutSwapBuffers();
 	glFlush();
 }
@@ -345,6 +369,7 @@ int main(int argc, char* argv[])
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplGLUT_Init();
 	ImGui_ImplOpenGL3_Init();
+	gProfiler.setEnabled(vEnableProfiler);
 
 	Initialize();
 	glutReshapeFunc(ReshapeFunction);
