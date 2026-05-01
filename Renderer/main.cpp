@@ -30,6 +30,24 @@ GLint winWidth = 1000, winHeight = 600;
 
 Profiler gProfiler(16384, 12);
 
+void UpdateSunLight(float deltaSeconds)
+{
+	static float sunAngle = atan2f(-0.25f, 0.35f);
+
+	if (vAnimateSun) {
+		sunAngle += deltaSeconds * vSunRotationSpeed * 3.14 / 180.0f;
+	}
+
+	const float horizontalStrength = 1.0f;
+	const float verticalStrength = -vSunElevation;
+	lights.myLight.position = glm::vec4(
+		cosf(sunAngle) * horizontalStrength,
+		sinf(sunAngle) * horizontalStrength,
+		verticalStrength,
+		0.0f
+	);
+}
+
 void ProcessNormalKeys(unsigned char key, int x, int y) {
 	ImGui_ImplGLUT_KeyboardFunc(key, x, y);
 	if (!ImGui::GetIO().WantCaptureKeyboard) {
@@ -170,6 +188,8 @@ void ShowMyImGuiWindow()
 
 	// Vegetation
 	ImGui::Text("Vegetation");
+	ImGui::Checkbox("Enable Vegetation Instancing", &vEnableVegetationInstancing);
+	ImGui::Checkbox("Enable Vegetation Shadows", &vEnableVegetationShadows);
 	ImGui::SliderInt("Tree LOD Distribution", &vTreeLodDistribution, 1, 5);
 	ImGui::SliderInt("Tree Instance Count", &vTreeInstanceCount, 0, 64);
 	ImGui::SliderFloat("Lower Tree Threshold", &vLowerTreeTreshold, 0.0f, 1.0f);
@@ -196,6 +216,16 @@ void ShowMyImGuiWindow()
 	ImGui::SliderFloat("Biome Amplitude", &vBiomeAmplitude, 1.0f, 20.0f);
 	ImGui::SliderFloat("Biome Lacunarity", &vBiomeLacunarity, 0.01f, 10.0f);
 	ImGui::SliderFloat("Biome Gain", &vBiomeGain, 0.0f, 1.0f);
+
+	ImGui::Separator();
+
+	// Shading
+	ImGui::Text("Shading");
+	const char* shadingModels[] = { "Gouraud", "Phong", "Blinn-Phong" };
+	ImGui::Combo("Lighting Model", &vShadingModel, shadingModels, IM_ARRAYSIZE(shadingModels));
+	ImGui::Checkbox("Animate Sun", &vAnimateSun);
+	ImGui::SliderFloat("Sun Speed", &vSunRotationSpeed, 0.0f, 45.0f, "%.1f deg/s");
+	ImGui::SliderFloat("Sun Elevation", &vSunElevation, 0.1f, 2.0f, "%.2f");
 
 	// Reinitialization trigger
 	if (needsInitialization && !freezeSimulation)
@@ -283,13 +313,14 @@ void RenderFunction(void)
 	ImGui::NewFrame();
 
 	MyCamera.Update();
+	UpdateSunLight(delta.count());
+	models->MyTerrain->updateMap(MyCamera);
 
 	{
 		PROFILE_GPU(gProfiler, "terrain");
 		Shader& MyShader = shaders->MyTerrainShaderNoise;
 		MyShader.Bind();
 
-		models->MyTerrain->updateMap(MyCamera);
 		shaders->UpdateTerrainNoise(*models->MyTerrain, MyCamera, lights.myLight);
 		models->MyTerrain->Draw();
 
@@ -310,6 +341,34 @@ void RenderFunction(void)
 		shaders->MyInstancingShader.setUniformVec3("viewPos", MyCamera.getObs());
 		shaders->MyInstancingShader.setUniformInt("codCol", 0);
 		models->MyCube->Draw();
+	}
+
+	if (vEnableVegetationShadows) {
+		PROFILE_GPU(gProfiler, "vegetation shadows");
+		shaders->MyVegetationShadowShader.Bind();
+		shaders->UpdateVegetationShadow(*models->MyTerrain, MyCamera, lights.myLight);
+
+		GLint previousDepthFunc;
+		glGetIntegerv(GL_DEPTH_FUNC, &previousDepthFunc);
+
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_LEQUAL);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_MIN);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(-8.0f, -16.0f);
+		glDisable(GL_CULL_FACE);
+
+		models->MyTerrain->DrawVegetation(&shaders->MyVegetationShadowShader);
+
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_POLYGON_OFFSET_FILL);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_BLEND);
+		glDepthFunc(previousDepthFunc);
+		glDepthMask(GL_TRUE);
 	}
 
 	{

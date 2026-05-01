@@ -708,6 +708,8 @@ xcopy /y /d "$(ProjectDir)lib\x64\SOIL\*.dll" "$(OutDir)" &amp;</Command>
     <None Include="shaders\TerrainShaderHeightmap.vert" />
     <None Include="shaders\TerrainShaderNoise.frag" />
     <None Include="shaders\TerrainShaderNoise.vert" />
+    <None Include="shaders\VegetationShadowShader.frag" />
+    <None Include="shaders\VegetationShadowShader.vert" />
     <None Include="shaders\VegetationShader.frag" />
     <None Include="shaders\VegetationShader.vert" />
   </ItemGroup>

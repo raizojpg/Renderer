@@ -12,6 +12,7 @@ public:
 
 	void UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Light& MyLight);
 	void UpdateVegetation(Terrain& MyTerrain, Camera& MyCamera, Light& MyLight);
+	void UpdateVegetationShadow(Terrain& MyTerrain, Camera& MyCamera, Light& MyLight);
 
 	~ShaderManager();
 public:
@@ -21,4 +22,5 @@ public:
 	Shader MyTerrainShaderHeightmap;
 	Shader MyTerrainShaderNoise;
 	Shader MyVegetationShader;
+	Shader MyVegetationShadowShader;
 };

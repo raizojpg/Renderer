@@ -13,6 +13,10 @@ public:
 	~Tree();
 
 private:
-	GLuint VbPos, VbCol, VbMat, VbNorm, VbUV, IndexCount;
-};
+	void DrawInstanced();
+	void DrawNonInstanced();
 
+	GLuint VbPos, VbCol, VbMat, VbNorm, VbUV, IndexCount;
+	std::vector<glm::vec3> InstanceColors;
+	std::vector<glm::mat4> InstanceMatrices;
+};

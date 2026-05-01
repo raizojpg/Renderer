@@ -19,6 +19,8 @@ extern int vPatchSize;
 extern int vMaxLod;
 extern int vLodDistribution;
 
+extern bool vEnableVegetationInstancing;
+extern bool vEnableVegetationShadows;
 extern int vTreeLodDistribution;
 extern int vTreeInstanceCount;
 extern float vLowerTreeTreshold;
@@ -37,3 +39,8 @@ extern float vBiomeFrequency;
 extern float vBiomeAmplitude;
 extern float vBiomeLacunarity;
 extern float vBiomeGain;
+
+extern int vShadingModel;
+extern bool vAnimateSun;
+extern float vSunRotationSpeed;
+extern float vSunElevation;

@@ -19,6 +19,8 @@ int vPatchSize = 128;
 int vMaxLod = 10;
 int vLodDistribution = 1;
 
+bool vEnableVegetationInstancing = 1;
+bool vEnableVegetationShadows = 1;
 int vTreeLodDistribution = 2;
 int vTreeInstanceCount = 20;
 float vLowerTreeTreshold = 0.35;
@@ -37,3 +39,8 @@ float vBiomeFrequency = 0.05;
 float vBiomeAmplitude = 10;
 float vBiomeLacunarity = 4.0;
 float vBiomeGain = 0.25;
+
+int vShadingModel = 2;
+bool vAnimateSun = 1;
+float vSunRotationSpeed = 0.5f;
+float vSunElevation = 1.0f;

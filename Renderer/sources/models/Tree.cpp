@@ -1,9 +1,18 @@
 #include "Tree.h"
 #include "../Profiler.h"
+#include "../Variables.h"
 
 #define INSTANCE_COUNT 64
 
 Tree::Tree(){
+    VaoId = 0;
+    VboId = 0;
+    EboId = 0;
+    VbPos = 0;
+    VbCol = 0;
+    VbMat = 0;
+    VbNorm = 0;
+    VbUV = 0;
     IndexCount = 0;
 }
 
@@ -31,12 +40,12 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
     // ------------------------------------------------------------
     // Create instance colors
     // ------------------------------------------------------------
-    glm::vec3 Colors[INSTANCE_COUNT];
+    InstanceColors.resize(INSTANCE_COUNT);
     for (int instID = 0; instID < INSTANCE_COUNT; instID++)
     {
-        Colors[instID][0] = 0.7f + 0.1f * sinf(instID % 10 * 1.2f);
-        Colors[instID][1] = 0.7f + 0.1f * sinf(instID % 10 * 1.5f + 1.0f);
-        Colors[instID][2] = 0.7f + 0.1f * sinf(instID % 10 * 1.8f + 2.0f);
+        InstanceColors[instID][0] = 0.7f + 0.1f * sinf(instID % 10 * 1.2f);
+        InstanceColors[instID][1] = 0.7f + 0.1f * sinf(instID % 10 * 1.5f + 1.0f);
+        InstanceColors[instID][2] = 0.7f + 0.1f * sinf(instID % 10 * 1.8f + 2.0f);
     }
 
     // ------------------------------------------------------------
@@ -49,7 +58,7 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
     std::uniform_real_distribution<float> zDist(-150.0f, -50.0f);
     std::uniform_real_distribution<float> rotDist(-glm::pi<float>() / 16, glm::pi<float>() / 16);
 
-    glm::mat4 MatModel[INSTANCE_COUNT];
+    InstanceMatrices.resize(INSTANCE_COUNT);
     for (int instID = 0; instID < INSTANCE_COUNT; instID++)
     {
         tx = transDist(rng);
@@ -60,7 +69,7 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
         ry = rotDist(rng);
         rz = rotDist(rng);
 
-        MatModel[instID] =
+        InstanceMatrices[instID] =
             glm::rotate(glm::mat4(1.0f), glm::pi<float>(), glm::vec3(1, 0, 0))
             * glm::translate(glm::mat4(1.0f), glm::vec3(tx, ty, tz))
             * glm::rotate(glm::mat4(1.0f), rx, glm::vec3(1, 0, 0))
@@ -87,7 +96,7 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
     // Instance Color VBO (location = 1) 
     glGenBuffers(1, &VbCol);
     glBindBuffer(GL_ARRAY_BUFFER, VbCol);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, InstanceColors.size() * sizeof(glm::vec3), InstanceColors.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
     glVertexAttribDivisor(1, 1);
@@ -115,7 +124,7 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
     // Instance Model Matrix VBO (locations = 4,5,6,7)
     glGenBuffers(1, &VbMat);
     glBindBuffer(GL_ARRAY_BUFFER, VbMat);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(MatModel), MatModel, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, InstanceMatrices.size() * sizeof(glm::mat4), InstanceMatrices.data(), GL_STATIC_DRAW);
 
     for (int i = 0; i < 4; i++){
         glEnableVertexAttribArray(4 + i);
@@ -133,14 +142,59 @@ void Tree::CreateVAO(TreeGenParams& p, int seed)
         mesh.Indices.size() * sizeof(uint32_t),
         mesh.Indices.data(),
         GL_STATIC_DRAW);
-
 }
 
 void Tree::Draw(Shader* MyShader)
 {
+    if (vEnableVegetationInstancing) {
+        DrawInstanced();
+    }
+    else {
+        DrawNonInstanced();
+    }
+}
+
+void Tree::DrawInstanced()
+{
     this->Bind();
     int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
+    if (count <= 0 || IndexCount == 0) {
+        return;
+    }
+
     ProfilerGL::DrawElementsInstanced(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, 0, count);
+}
+
+void Tree::DrawNonInstanced()
+{
+    this->Bind();
+    int count = std::min(vTreeInstanceCount, INSTANCE_COUNT);
+    count = std::min(count, static_cast<int>(InstanceColors.size()));
+    count = std::min(count, static_cast<int>(InstanceMatrices.size()));
+
+    if (count <= 0 || IndexCount == 0) {
+        return;
+    }
+
+    glDisableVertexAttribArray(1);
+    for (int i = 0; i < 4; i++) {
+        glDisableVertexAttribArray(4 + i);
+    }
+
+    for (int instID = 0; instID < count; instID++) {
+        glVertexAttrib3fv(1, glm::value_ptr(InstanceColors[instID]));
+
+        for (int i = 0; i < 4; i++) {
+            glVertexAttrib4fv(4 + i, glm::value_ptr(InstanceMatrices[instID][i]));
+        }
+
+        ProfilerGL::DrawElements(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, 0);
+    }
+
+    glEnableVertexAttribArray(1);
+    for (int i = 0; i < 4; i++) {
+        glEnableVertexAttribArray(4 + i);
+    }
 }
 
 Tree::~Tree()

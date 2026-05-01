@@ -4,6 +4,7 @@ in vec3 ex_Color;
 in vec3 frag_Position;
 in vec3 frag_Normal;
 in vec3 in_ViewPos;
+in vec3 gouraud_Color;
 
 struct Material
 {
@@ -25,6 +26,7 @@ struct Light
 
 uniform Material materialShader;
 uniform Light lightShader;
+uniform int uShadingModel;
 
 out vec3 out_Color;
 
@@ -33,11 +35,8 @@ uniform float uFogStart;
 uniform float uFogEnd;
 vec3 fogColor = vec3(0.7, 0.7, 0.7);
 
-void main(void)
-{
-    vec3 s_normal = normalize(frag_Normal);
-    vec3 positionVertex3D = frag_Position;
-
+vec3 calculateLighting(vec3 positionVertex3D, vec3 normal, bool useBlinnSpecular) {
+    vec3 s_normal = normalize(normal);
     vec3 positionSource3D = vec3(lightShader.position);
     float distSV = distance(positionSource3D, positionVertex3D);
 
@@ -62,13 +61,14 @@ void main(void)
 
     viewDir = normalize(in_ViewPos - positionVertex3D);
 
-    //Phong
-    //reflectDir = normalize(reflect(-lightDir, s_normal));
-    //specCoeff = pow(max(dot(viewDir, reflectDir), 0.0), materialShader.shininessValue);
-
-    // Blinn:
-    vec3 halfDir = normalize(lightDir + viewDir);
-    specCoeff = pow(max(dot(s_normal, halfDir), 0.0), materialShader.shininessValue);
+    if (useBlinnSpecular) {
+        vec3 halfDir = normalize(lightDir + viewDir);
+        specCoeff = pow(max(dot(s_normal, halfDir), 0.0), materialShader.shininessValue);
+    }
+    else {
+        reflectDir = normalize(reflect(-lightDir, s_normal));
+        specCoeff = pow(max(dot(viewDir, reflectDir), 0.0), materialShader.shininessValue);
+    }
 
     vec3 specular_term = specCoeff * lightShader.specular * materialShader.specular;
 
@@ -77,9 +77,18 @@ void main(void)
     else
         attenuation_factor = 1.0;
 
-    vec3 phongColor = emission + ambient_model + attenuation_factor*(ambient_term + diffuse_term + specular_term);
+    return emission + ambient_model + attenuation_factor*(ambient_term + diffuse_term + specular_term);
+}
 
-    result = clamp(phongColor + ex_Color, 0.0, 1.0);
+void main(void)
+{
+    vec3 lightingColor;
+    if (uShadingModel == 0)
+        lightingColor = gouraud_Color;
+    else
+        lightingColor = calculateLighting(frag_Position, frag_Normal, uShadingModel == 2);
+
+    result = clamp(lightingColor + ex_Color, 0.0, 1.0);
 
     float distance = length(in_ViewPos - frag_Position);
     float fogFactor = clamp((uFogEnd - distance) / (uFogEnd - uFogStart), 0.0, 1.0);

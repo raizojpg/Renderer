@@ -1677,5 +1677,11 @@
     <None Include="shaders\VegetationShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="shaders\VegetationShadowShader.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="shaders\VegetationShadowShader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
