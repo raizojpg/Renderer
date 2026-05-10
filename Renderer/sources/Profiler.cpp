@@ -194,7 +194,7 @@ FrameStats Profiler::endFrame() {
 }
 
 void Profiler::beginGpuSection(const std::string& name) {
-	if (!enabled || !gpuSupported || name.empty()) {
+	if (!enabled || !frameActive || !gpuSupported || name.empty()) {
 		return;
 	}
 
@@ -212,7 +212,7 @@ void Profiler::beginGpuSection(const std::string& name) {
 }
 
 void Profiler::endGpuSection() {
-	if (!enabled || !gpuSupported || !gpuSectionOpen) {
+	if (!enabled || !frameActive || !gpuSupported || !gpuSectionOpen) {
 		return;
 	}
 
@@ -221,7 +221,7 @@ void Profiler::endGpuSection() {
 }
 
 void Profiler::incrementDrawCall(std::uint32_t count) {
-	if (!enabled) {
+	if (!enabled || !frameActive) {
 		return;
 	}
 

@@ -30,6 +30,16 @@ GLint winWidth = 1000, winHeight = 600;
 
 Profiler gProfiler(16384, 12);
 
+void ApplyBackfaceCullingState()
+{
+	if (vEnableBackfaceCulling) {
+		glEnable(GL_CULL_FACE);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}
+}
+
 void UpdateSunLight(float deltaSeconds)
 {
 	static float sunAngle = atan2f(-0.25f, 0.35f);
@@ -145,6 +155,7 @@ void ShowMyImGuiWindow()
 	}
 
 	ImGui::Checkbox("Enable Frustum Culling", &vEnableFrustumCulling);
+	ImGui::Checkbox("Enable Backface Culling", &vEnableBackfaceCulling);
 	ImGui::SliderInt("Speed", &vSpeed, 1, 2000);
 	needsInitialization |= ImGui::SliderInt("Seed", &vSeed, 1, 5000);
 	freezeSimulation |= ImGui::IsItemActive();
@@ -305,7 +316,7 @@ void RenderFunction(void)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glFrontFace(GL_CCW); 
-	glEnable(GL_CULL_FACE);
+	ApplyBackfaceCullingState();
 	glEnable(GL_DEPTH_TEST);
 		
 	ImGui_ImplOpenGL3_NewFrame();
@@ -344,7 +355,7 @@ void RenderFunction(void)
 	}
 
 	if (vEnableVegetationShadows) {
-		PROFILE_GPU(gProfiler, "vegetation shadows");
+		PROFILE_GPU(gProfiler, "vegetation_shadows");
 		shaders->MyVegetationShadowShader.Bind();
 		shaders->UpdateVegetationShadow(*models->MyTerrain, MyCamera, lights.myLight);
 
@@ -362,7 +373,7 @@ void RenderFunction(void)
 
 		models->MyTerrain->DrawVegetation(&shaders->MyVegetationShadowShader);
 
-		glEnable(GL_CULL_FACE);
+		ApplyBackfaceCullingState();
 		glDisable(GL_POLYGON_OFFSET_FILL);
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -379,7 +390,7 @@ void RenderFunction(void)
 	}
 
 	if (vEnableOverview) {
-		PROFILE_GPU(gProfiler, "overview");
+		PROFILE_GPU(gProfiler, "world_overview");
 		glDisable(GL_DEPTH_TEST);
 		glViewport(winWidth - winWidth / 4 - 10, winHeight - winHeight / 4 - 10, winWidth / 4, winHeight / 4);
 

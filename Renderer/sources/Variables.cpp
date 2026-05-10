@@ -4,6 +4,7 @@ int vSpeed = 200;
 int vSeed = 1338;
 bool vEnableProfiler = 0;
 bool vEnableFrustumCulling = 1;
+bool vEnableBackfaceCulling = 1;
 bool vEnableOverview = 0;
 
 int vSkyboxScale = 200;

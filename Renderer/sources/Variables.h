@@ -4,6 +4,7 @@ extern int vSpeed;
 extern int vSeed;
 extern bool vEnableProfiler;
 extern bool vEnableFrustumCulling;
+extern bool vEnableBackfaceCulling;
 extern bool vEnableOverview;
 
 extern int vSkyboxScale;
