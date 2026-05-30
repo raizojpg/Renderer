@@ -14,10 +14,16 @@ public:
 	int getStep();
 	int getPatchSize();
 	int getMaxHeight();
-	int getHeightmapTex();
+	GLuint getHeightmapTex();
+	GLuint getGrassTexture();
+	GLuint getRockTexture();
+	GLuint getSnowTexture();
+	GLuint getBarkTexture();
+	GLuint getSkyTexture();
 	glm::mat4 getTerrainMat();
 
 	void loadHightmap();
+	void loadTerrainTextures();
 	void updateMap(Camera& MyCamera);
 	void updateLodMap(glm::vec3 obs);
 	void updateCullMap(Camera& MyCamera);
@@ -33,6 +39,11 @@ private:
 	int imgWidth, imgHeight;
 	int patchSize, maxLod;
 	GLuint heightmapTex;
+	GLuint grassTexture;
+	GLuint rockTexture;
+	GLuint snowTexture;
+	GLuint barkTexture;
+	GLuint skyTexture;
 
 	struct BufferInfo {
 		int start;
@@ -49,5 +60,7 @@ private:
 	std::vector<std::vector<bool>> cullMap;
 
 	VegetationManager vegetation;
+
+	GLuint loadTerrainTexture(const char* path, const glm::vec3& fallbackColor);
 };
 

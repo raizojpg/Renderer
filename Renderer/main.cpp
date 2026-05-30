@@ -230,6 +230,17 @@ void ShowMyImGuiWindow()
 
 	ImGui::Separator();
 
+	// Terrain Textures
+	ImGui::Text("Terrain Textures");
+	ImGui::Checkbox("Use Terrain Textures", &vUseTerrainTextures);
+	ImGui::SliderFloat("Texture Scale", &vTerrainTextureScale, 500.0f, 20000.0f, "%.0f");
+	ImGui::SliderFloat("Grass Rock Threshold", &vTerrainGrassRockThreshold, 0.0f, 1.0f);
+	ImGui::SliderFloat("Rock Snow Threshold", &vTerrainRockSnowThreshold, 0.0f, 1.0f);
+	ImGui::SliderFloat("Texture Blend Range", &vTerrainTextureBlendRange, 0.01f, 0.5f);
+	ImGui::SliderFloat("Tree Texture Scale", &vTreeTextureScale, 0.1f, 8.0f, "%.2f");
+
+	ImGui::Separator();
+
 	// Shading
 	ImGui::Text("Shading");
 	const char* shadingModels[] = { "Gouraud", "Phong", "Blinn-Phong" };
@@ -340,8 +351,10 @@ void RenderFunction(void)
 		glm::mat4 skyboxMat = glm::translate(glm::mat4(1.0f), MyCamera.getObs()) * glm::scale(glm::mat4(1.0f), glm::vec3(vSkyboxScale, vSkyboxScale, vSkyboxScale));
 		MyShader.setUniformMat4("modelMatrix", skyboxMat);
 		MyShader.setUniformInt("codCol", 2);
+		MyShader.setUniformInt("uUseSkyTexture", vUseTerrainTextures);
 		MyShader.updateMaterial(models->MySkybox->getMaterial());
 		models->MySkybox->Draw();
+		MyShader.setUniformInt("uUseSkyTexture", 0);
 
 		MyShader.setUniformVec3("viewPos", MyCamera.getObs());
 		models->Update(MyShader);
@@ -365,8 +378,14 @@ void RenderFunction(void)
 		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_BLEND);
-		glBlendEquation(GL_MIN);
-		glBlendFunc(GL_ONE, GL_ONE);
+		if (vUseTerrainTextures) {
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else {
+			glBlendEquation(GL_MIN);
+			glBlendFunc(GL_ONE, GL_ONE);
+		}
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(-8.0f, -16.0f);
 		glDisable(GL_CULL_FACE);

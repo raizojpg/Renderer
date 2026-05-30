@@ -20,6 +20,7 @@ void ModelManager::Initialize() {
 	MyCube->CreateVAO();
 
 	MyTerrain->loadHightmap();
+	MyTerrain->loadTerrainTextures();
 	MyTerrain->CreateVAO();
 	MyTerrain->setMaterial(materials.opaque);
 	

@@ -41,6 +41,13 @@ extern float vBiomeAmplitude;
 extern float vBiomeLacunarity;
 extern float vBiomeGain;
 
+extern bool vUseTerrainTextures;
+extern float vTerrainTextureScale;
+extern float vTerrainGrassRockThreshold;
+extern float vTerrainRockSnowThreshold;
+extern float vTerrainTextureBlendRange;
+extern float vTreeTextureScale;
+
 extern int vShadingModel;
 extern bool vAnimateSun;
 extern float vSunRotationSpeed;

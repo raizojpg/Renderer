@@ -39,6 +39,11 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	MyShader.setUniformFloat("uBiomeAmplitude", vBiomeAmplitude);
 	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
 	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
+	MyShader.setUniformInt("uUseTerrainTextures", vUseTerrainTextures);
+	MyShader.setUniformFloat("uTerrainTextureScale", vTerrainTextureScale);
+	MyShader.setUniformFloat("uGrassRockThreshold", vTerrainGrassRockThreshold);
+	MyShader.setUniformFloat("uRockSnowThreshold", vTerrainRockSnowThreshold);
+	MyShader.setUniformFloat("uTextureBlendRange", vTerrainTextureBlendRange);
 
 	MyShader.setUniformInt("uUseFog", vUseFog);
 	MyShader.setUniformFloat("uFogStart", vFogStart);
@@ -48,6 +53,22 @@ void ShaderManager::UpdateTerrainNoise(Terrain& MyTerrain, Camera& MyCamera, Lig
 	glBindTexture(GL_TEXTURE_2D, MyTerrain.getHeightmapTex());
 	MyShader.setUniformInt("heightmap", 0);
 	MyShader.setUniformFloat("heightmapScale", (MyTerrain.getPatchSize() - 1) * (MyTerrain.getPatchSize() - 1) * MyTerrain.getStep() / 2);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, MyTerrain.getGrassTexture());
+	MyShader.setUniformInt("grassTexture", 1);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, MyTerrain.getRockTexture());
+	MyShader.setUniformInt("rockTexture", 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, MyTerrain.getSnowTexture());
+	MyShader.setUniformInt("snowTexture", 3);
+
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, MyTerrain.getSkyTexture());
+	MyShader.setUniformInt("skyTexture", 5);
 
 }
 
@@ -78,6 +99,12 @@ void ShaderManager::UpdateVegetation(Terrain& MyTerrain, Camera& MyCamera, Light
 	MyShader.setUniformFloat("uBiomeAmplitude", vBiomeAmplitude);
 	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
 	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
+	MyShader.setUniformInt("uUseTreeTextures", vUseTerrainTextures);
+	MyShader.setUniformFloat("uTreeTextureScale", vTreeTextureScale);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, MyTerrain.getBarkTexture());
+	MyShader.setUniformInt("barkTexture", 4);
 
 	MyShader.setUniformFloat("uFogStart", vFogStart);
 	MyShader.setUniformFloat("uFogEnd", vFogEnd);
@@ -107,6 +134,7 @@ void ShaderManager::UpdateVegetationShadow(Terrain& MyTerrain, Camera& MyCamera,
 	MyShader.setUniformFloat("uBiomeAmplitude", vBiomeAmplitude);
 	MyShader.setUniformFloat("uBiomeLacunarity", vBiomeLacunarity);
 	MyShader.setUniformFloat("uBiomeGain", vBiomeGain);
+	MyShader.setUniformInt("uUseTerrainTextures", vUseTerrainTextures);
 
 	MyShader.setUniformFloat("uShadowBias", 0.0f);
 	MyShader.setUniformFloat("uShadowThickness", 18.0f);

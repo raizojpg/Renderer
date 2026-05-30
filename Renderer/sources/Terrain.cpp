@@ -2,9 +2,102 @@
 #include "Profiler.h"
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 #include "SOIL.h"
 
-Terrain::Terrain(int w, int l, int s) : WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l }, step{s} {
+namespace {
+int ReadLE16(const unsigned char* data)
+{
+	return data[0] | (data[1] << 8);
+}
+
+int ReadLE32(const unsigned char* data)
+{
+	return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+}
+
+bool LoadBmpRgb(const char* path, std::vector<unsigned char>& pixels, int& width, int& height)
+{
+	std::ifstream file(path, std::ios::binary);
+	if (!file) {
+		return false;
+	}
+
+	std::vector<unsigned char> bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	if (bytes.size() < 54 || bytes[0] != 'B' || bytes[1] != 'M') {
+		return false;
+	}
+
+	const int dataOffset = ReadLE32(&bytes[10]);
+	const int headerSize = ReadLE32(&bytes[14]);
+	if (headerSize < 40 || bytes.size() < static_cast<size_t>(14 + headerSize)) {
+		return false;
+	}
+
+	width = ReadLE32(&bytes[18]);
+	int rawHeight = ReadLE32(&bytes[22]);
+	const int planes = ReadLE16(&bytes[26]);
+	const int bitsPerPixel = ReadLE16(&bytes[28]);
+	const int compression = ReadLE32(&bytes[30]);
+
+	if (width <= 0 || rawHeight == 0 || planes != 1 || (bitsPerPixel != 24 && bitsPerPixel != 32) || compression != 0) {
+		return false;
+	}
+
+	height = rawHeight < 0 ? -rawHeight : rawHeight;
+	const bool topDown = rawHeight < 0;
+	const int bytesPerPixel = bitsPerPixel / 8;
+	const int rowStride = ((width * bytesPerPixel + 3) / 4) * 4;
+	if (dataOffset < 0 || bytes.size() < static_cast<size_t>(dataOffset + rowStride * height)) {
+		return false;
+	}
+
+	pixels.resize(width * height * 3);
+	for (int y = 0; y < height; y++) {
+		const int srcY = topDown ? y : (height - 1 - y);
+		const unsigned char* srcRow = &bytes[dataOffset + srcY * rowStride];
+		for (int x = 0; x < width; x++) {
+			const unsigned char* src = srcRow + x * bytesPerPixel;
+			unsigned char* dst = &pixels[(y * width + x) * 3];
+			dst[0] = src[2];
+			dst[1] = src[1];
+			dst[2] = src[0];
+		}
+	}
+
+	return true;
+}
+
+GLuint CreateFallbackTexture(const glm::vec3& color)
+{
+	unsigned char pixels[4 * 4 * 3];
+	for (int i = 0; i < 4 * 4; i++) {
+		const float checker = ((i + i / 4) % 2 == 0) ? 1.0f : 0.75f;
+		pixels[i * 3 + 0] = static_cast<unsigned char>(glm::clamp(color.r * checker, 0.0f, 1.0f) * 255.0f);
+		pixels[i * 3 + 1] = static_cast<unsigned char>(glm::clamp(color.g * checker, 0.0f, 1.0f) * 255.0f);
+		pixels[i * 3 + 2] = static_cast<unsigned char>(glm::clamp(color.b * checker, 0.0f, 1.0f) * 255.0f);
+	}
+
+	GLuint textureId = 0;
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	return textureId;
+}
+}
+
+Terrain::Terrain(int w, int l, int s)
+	: WIDTH{ w }, LENGTH{ l }, NR_VF{ w * l }, step{ s }, maxHeight{ 0.0f }, heightData{ nullptr },
+	imgWidth{ 0 }, imgHeight{ 0 }, patchSize{ 0 }, maxLod{ 0 }, heightmapTex{ 0 },
+	grassTexture{ 0 }, rockTexture{ 0 }, snowTexture{ 0 }, barkTexture{ 0 }, skyTexture{ 0 } {
 	maxHeight = vMaxHeight;
 	terrainMat = glm::translate(glm::mat4(1.0f), glm::vec3(-(w-1) * s / 2, -(l-1) * s / 2, 2000));
 	srand(static_cast<unsigned>(time(0)));
@@ -324,7 +417,17 @@ int Terrain::getPatchSize() { return patchSize; }
 
 int Terrain::getMaxHeight(){ return maxHeight;}
 
-int Terrain::getHeightmapTex(){ return heightmapTex; }
+GLuint Terrain::getHeightmapTex(){ return heightmapTex; }
+
+GLuint Terrain::getGrassTexture() { return grassTexture; }
+
+GLuint Terrain::getRockTexture() { return rockTexture; }
+
+GLuint Terrain::getSnowTexture() { return snowTexture; }
+
+GLuint Terrain::getBarkTexture() { return barkTexture; }
+
+GLuint Terrain::getSkyTexture() { return skyTexture; }
 
 glm::mat4 Terrain::getTerrainMat() { return terrainMat; }
 
@@ -342,6 +445,99 @@ void Terrain::loadHightmap(){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, imgWidth, imgHeight, 0, GL_RED, GL_UNSIGNED_BYTE, heightData);
 
+}
+
+GLuint Terrain::loadTerrainTexture(const char* path, const glm::vec3& fallbackColor)
+{
+	std::vector<std::string> candidates = {
+		path,
+		std::string("Renderer/") + path,
+		std::string("../Renderer/") + path,
+		std::string("../../Renderer/") + path
+	};
+
+	int width = 0;
+	int height = 0;
+	std::vector<unsigned char> bmpPixels;
+	unsigned char* soilPixels = nullptr;
+	const unsigned char* imageData = nullptr;
+	std::string loadedPath;
+
+	for (const std::string& candidate : candidates) {
+		int channels = 0;
+		soilPixels = SOIL_load_image(candidate.c_str(), &width, &height, &channels, SOIL_LOAD_RGB);
+		if (soilPixels != nullptr && width > 0 && height > 0) {
+			imageData = soilPixels;
+			loadedPath = candidate;
+			break;
+		}
+
+		if (soilPixels != nullptr) {
+			SOIL_free_image_data(soilPixels);
+			soilPixels = nullptr;
+		}
+
+		if (LoadBmpRgb(candidate.c_str(), bmpPixels, width, height)) {
+			imageData = bmpPixels.data();
+			loadedPath = candidate;
+			break;
+		}
+
+		std::cout << "Failed to load terrain texture '" << candidate << "': " << SOIL_last_result() << std::endl;
+	}
+
+	if (imageData == nullptr) {
+		std::cout << "Using fallback terrain texture for '" << path << "'" << std::endl;
+		return CreateFallbackTexture(fallbackColor);
+	}
+
+	GLuint texture = 0;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	if (soilPixels != nullptr) {
+		SOIL_free_image_data(soilPixels);
+	}
+
+	std::cout << "Loaded terrain texture '" << loadedPath << "' (" << width << "x" << height << ")" << std::endl;
+
+	return texture;
+}
+
+void Terrain::loadTerrainTextures()
+{
+	if (grassTexture != 0) {
+		glDeleteTextures(1, &grassTexture);
+		grassTexture = 0;
+	}
+	if (rockTexture != 0) {
+		glDeleteTextures(1, &rockTexture);
+		rockTexture = 0;
+	}
+	if (snowTexture != 0) {
+		glDeleteTextures(1, &snowTexture);
+		snowTexture = 0;
+	}
+	if (barkTexture != 0) {
+		glDeleteTextures(1, &barkTexture);
+		barkTexture = 0;
+	}
+	if (skyTexture != 0) {
+		glDeleteTextures(1, &skyTexture);
+		skyTexture = 0;
+	}
+
+	grassTexture = loadTerrainTexture("resources/grass.bmp", glm::vec3(0.20f, 0.45f, 0.16f));
+	rockTexture = loadTerrainTexture("resources/rock.bmp", glm::vec3(0.43f, 0.40f, 0.36f));
+	snowTexture = loadTerrainTexture("resources/snow.bmp", glm::vec3(0.88f, 0.90f, 0.86f));
+	barkTexture = loadTerrainTexture("resources/bark1.bmp", glm::vec3(0.36f, 0.20f, 0.10f));
+	skyTexture = loadTerrainTexture("resources/sky.bmp", glm::vec3(0.42f, 0.64f, 0.92f));
 }
 
 void Terrain::updateMap(Camera& MyCamera)
@@ -411,5 +607,30 @@ Terrain::~Terrain(){
 	if (heightData) {
 		SOIL_free_image_data(heightData);
 		heightData = nullptr;
+	}
+
+	if (heightmapTex != 0) {
+		glDeleteTextures(1, &heightmapTex);
+		heightmapTex = 0;
+	}
+	if (grassTexture != 0) {
+		glDeleteTextures(1, &grassTexture);
+		grassTexture = 0;
+	}
+	if (rockTexture != 0) {
+		glDeleteTextures(1, &rockTexture);
+		rockTexture = 0;
+	}
+	if (snowTexture != 0) {
+		glDeleteTextures(1, &snowTexture);
+		snowTexture = 0;
+	}
+	if (barkTexture != 0) {
+		glDeleteTextures(1, &barkTexture);
+		barkTexture = 0;
+	}
+	if (skyTexture != 0) {
+		glDeleteTextures(1, &skyTexture);
+		skyTexture = 0;
 	}
 }

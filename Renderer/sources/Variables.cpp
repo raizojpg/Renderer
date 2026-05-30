@@ -41,6 +41,13 @@ float vBiomeAmplitude = 10;
 float vBiomeLacunarity = 4.0;
 float vBiomeGain = 0.25;
 
+bool vUseTerrainTextures = 1;
+float vTerrainTextureScale = 5000.0f;
+float vTerrainGrassRockThreshold = 1.0f;
+float vTerrainRockSnowThreshold = 0.6f;
+float vTerrainTextureBlendRange = 0.125f;
+float vTreeTextureScale = 0.5f;
+
 int vShadingModel = 2;
 bool vAnimateSun = 1;
 float vSunRotationSpeed = 0.5f;

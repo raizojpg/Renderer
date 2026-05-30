@@ -5,6 +5,7 @@ in vec3 frag_Position;
 in vec3 frag_Normal;
 in vec3 in_ViewPos;
 in vec3 gouraud_Color;
+in vec2 tree_TexUV;
 
 struct Material
 {
@@ -27,6 +28,9 @@ struct Light
 uniform Material materialShader;
 uniform Light lightShader;
 uniform int uShadingModel;
+uniform int uUseTreeTextures;
+uniform sampler2D barkTexture;
+uniform float uTreeTextureScale;
 
 out vec3 out_Color;
 
@@ -80,6 +84,20 @@ vec3 calculateLighting(vec3 positionVertex3D, vec3 normal, bool useBlinnSpecular
     return emission + ambient_model + attenuation_factor*(ambient_term + diffuse_term + specular_term);
 }
 
+vec3 calculateNeutralTreeLighting(vec3 positionVertex3D, vec3 normal) {
+    vec3 s_normal = normalize(normal);
+    vec3 positionSource3D = vec3(lightShader.position);
+
+    vec3 lightDir;
+    if (lightShader.position.w == 0.0)
+        lightDir = normalize(positionSource3D);
+    else
+        lightDir = normalize(positionSource3D - positionVertex3D);
+
+    float diffCoeff = max(dot(s_normal, lightDir), 0.0);
+    return vec3(0.72 + 0.80 * diffCoeff);
+}
+
 void main(void)
 {
     vec3 lightingColor;
@@ -88,7 +106,15 @@ void main(void)
     else
         lightingColor = calculateLighting(frag_Position, frag_Normal, uShadingModel == 2);
 
-    result = clamp(lightingColor + ex_Color, 0.0, 1.0);
+    if (uUseTreeTextures == 1) {
+        vec2 barkUV = vec2(tree_TexUV.x, tree_TexUV.y * uTreeTextureScale);
+        vec3 barkColor = texture(barkTexture, barkUV).rgb;
+        vec3 neutralLight = calculateNeutralTreeLighting(frag_Position, frag_Normal);
+        result = clamp(barkColor * clamp(neutralLight, 0.70, 1.40), 0.0, 1.0);
+    }
+    else {
+        result = clamp(lightingColor + ex_Color, 0.0, 1.0);
+    }
 
     float distance = length(in_ViewPos - frag_Position);
     float fogFactor = clamp((uFogEnd - distance) / (uFogEnd - uFogStart), 0.0, 1.0);

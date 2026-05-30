@@ -25,6 +25,7 @@ uniform float uBiomeAmplitude;
 uniform float uBiomeLacunarity;
 uniform float uBiomeGain;
 uniform int uShadingModel;
+uniform float uTerrainTextureScale;
 
 struct Material
 {
@@ -52,6 +53,10 @@ out vec3 frag_Position;
 out vec3 frag_Normal;
 out vec3 in_ViewPos;
 out vec3 gouraud_Color;
+out vec2 terrain_TexUV;
+out float terrain_HeightFactor;
+out float terrain_BiomeFactor;
+out vec3 sky_Direction;
 
 /* ---------- Noise ---------- */
 
@@ -155,6 +160,10 @@ void main(void)
 {
     vec4 position;
     vec3 vertexPosition;
+    terrain_TexUV = in_UVs;
+    terrain_HeightFactor = 0.0;
+    terrain_BiomeFactor = 0.0;
+    sky_Direction = normalize(in_Position.xyz);
 
     if(usingNoise == 1){
         vec4 worldPos = modelMatrix * in_Position;
@@ -181,6 +190,8 @@ void main(void)
 
         bnoise = bnoise * 0.75 + 0.0;
         noise = noise * 0.5 + 0.5;
+        float baseNoise = noise;
+        float biomeFactor = clamp(bnoise, 0.0, 1.0);
       
         if(usingBiomes == 1){
 			noise = mix(noise, bnoise, bnoise);
@@ -192,6 +203,9 @@ void main(void)
 
         position = projectionMatrix * viewMatrix * modelMatrix * displacedPosition;
         vertexPosition = vec3(displacedPosition);
+        terrain_TexUV = worldPos.xy / max(uTerrainTextureScale, 1.0);
+        terrain_HeightFactor = clamp(noise, 0.0, 1.0);
+        terrain_BiomeFactor = (usingBiomes == 1) ? biomeFactor : baseNoise;
         
         if (noise < 4){
             ex_Color = vec3(noise);
@@ -211,6 +225,10 @@ void main(void)
         position = projectionMatrix * viewMatrix * modelMatrix * in_Position;
         vertexPosition = vec3(in_Position);
         ex_Color = in_Color;
+        terrain_TexUV = in_UVs;
+        terrain_HeightFactor = clamp(-in_Position.z / max(uMaxHeight, 1.0), 0.0, 1.0);
+        terrain_BiomeFactor = terrain_HeightFactor;
+        sky_Direction = normalize(in_Position.xyz);
     }
     
     gl_Position = position;

@@ -55,6 +55,7 @@ out vec3 frag_Position;
 out vec3 frag_Normal;
 out vec3 in_ViewPos;
 out vec3 gouraud_Color;
+out vec2 tree_TexUV;
 
 /* ---------- Noise ---------- */
 
@@ -216,6 +217,7 @@ void main(void)
     
     in_ViewPos = viewPos;
     ex_Color = in_Color;
+    tree_TexUV = in_UVs;
     gouraud_Color = calculateLighting(frag_Position, frag_Normal, false);
   
 }
